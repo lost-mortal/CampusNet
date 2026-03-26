@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyber-dark: #0f0f13;
+  --color-cyber-gray: #1e1e24;
+  --color-cyber-neon: #00f3ff;
+  --color-cyber-pink: #ff00ff;
+  --color-cyber-purple: #bc13fe;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-cyber-dark);
+    color: white;
+    overflow-x: hidden;
+  }
+}
