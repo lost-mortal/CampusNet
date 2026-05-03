@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const Post = require('../models/Post');
+require('../models/Club');       // must be imported so Mongoose can populate refs
+require('../models/Community');  // must be imported so Mongoose can populate refs
 const requireAuth = require('../middleware/auth');
 
 const CLUB_ICONS = {
