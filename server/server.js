@@ -13,7 +13,10 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    // Allow all Vercel preview/deployment URLs for this project
+    if (origin.endsWith('.vercel.app')) return cb(null, true);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
