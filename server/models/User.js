@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
   year: { type: String, enum: ['FE', 'SE', 'TE', 'BE'] },
   joinYear: { type: Number },
   mustChangePassword: { type: Boolean, default: true },
+  motherName: { type: String, default: '' },
+  birthDate: { type: String, default: '' }, // DDMMYY
   bio: { type: String, default: '' },
   profilePic: { type: String, default: '' },
   college: { type: String, default: 'SINHGAD_ENGINEERING' },

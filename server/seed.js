@@ -13,8 +13,7 @@ const Connection   = require('./models/Connection');
 const Message      = require('./models/Message');
 const Announcement = require('./models/Announcement');
 
-const COLLEGE          = 'SINHGAD_ENGINEERING';
-const DEFAULT_PASSWORD = 'CampusNet@123';
+const COLLEGE = 'SINHGAD_ENGINEERING';
 
 async function seed() {
   await mongoose.connect(process.env.MONGODB_URI);
@@ -34,12 +33,12 @@ async function seed() {
   ]);
   console.log('Collections cleared');
 
-  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
+  const adminHash = await bcrypt.hash('CampusNet@123', 10);
 
   // ─── Admin ────────────────────────────────────────────────────────────────
   await User.create({
     email: 'admin@sinhgad.edu',
-    passwordHash,
+    passwordHash: adminHash,
     firstName: 'Campus',
     lastName: 'Admin',
     role: 'admin',
@@ -48,38 +47,39 @@ async function seed() {
   });
 
   // ─── Students ─────────────────────────────────────────────────────────────
-  // Roll number format: {yearCode}{joinYear}{deptCode}{num}
-  // e.g. fe2025comp001 → email: arjun.fe2025comp001@sinhgad.edu
+  // Password: motherName.toLowerCase() + '@' + birthDate (DDMMYY)
   const studentDefs = [
     // FE — joined 2025
-    { firstName: 'Arjun',     lastName: 'Sharma',   dept: 'COMP', year: 'FE', jy: 2025, num: '001' },
-    { firstName: 'Priya',     lastName: 'Patel',    dept: 'COMP', year: 'FE', jy: 2025, num: '002' },
-    { firstName: 'Rohan',     lastName: 'Desai',    dept: 'ENTC', year: 'FE', jy: 2025, num: '001' },
-    { firstName: 'Ananya',    lastName: 'Joshi',    dept: 'IT',   year: 'FE', jy: 2025, num: '001' },
-    { firstName: 'Vikram',    lastName: 'Kulkarni', dept: 'MECH', year: 'FE', jy: 2025, num: '001' },
+    { firstName: 'Arjun',     lastName: 'Sharma',   dept: 'COMP', year: 'FE', jy: 2025, num: '001', motherName: 'Sunita',   birthDate: '150807' },
+    { firstName: 'Priya',     lastName: 'Patel',    dept: 'COMP', year: 'FE', jy: 2025, num: '002', motherName: 'Kavitha',  birthDate: '220806' },
+    { firstName: 'Rohan',     lastName: 'Desai',    dept: 'ENTC', year: 'FE', jy: 2025, num: '001', motherName: 'Meena',    birthDate: '030807' },
+    { firstName: 'Ananya',    lastName: 'Joshi',    dept: 'IT',   year: 'FE', jy: 2025, num: '001', motherName: 'Rekha',    birthDate: '120807' },
+    { firstName: 'Vikram',    lastName: 'Kulkarni', dept: 'MECH', year: 'FE', jy: 2025, num: '001', motherName: 'Savita',   birthDate: '280706' },
     // SE — joined 2024
-    { firstName: 'Sneha',     lastName: 'Iyer',     dept: 'COMP', year: 'SE', jy: 2024, num: '001' },
-    { firstName: 'Rahul',     lastName: 'Nair',     dept: 'COMP', year: 'SE', jy: 2024, num: '002' },
-    { firstName: 'Kavya',     lastName: 'Rao',      dept: 'ENTC', year: 'SE', jy: 2024, num: '001' },
-    { firstName: 'Aditya',    lastName: 'Mehta',    dept: 'IT',   year: 'SE', jy: 2024, num: '001' },
-    { firstName: 'Pooja',     lastName: 'Singh',    dept: 'MECH', year: 'SE', jy: 2024, num: '001' },
+    { firstName: 'Sneha',     lastName: 'Iyer',     dept: 'COMP', year: 'SE', jy: 2024, num: '001', motherName: 'Lakshmi',  birthDate: '150605' },
+    { firstName: 'Rahul',     lastName: 'Nair',     dept: 'COMP', year: 'SE', jy: 2024, num: '002', motherName: 'Priya',    birthDate: '070605' },
+    { firstName: 'Kavya',     lastName: 'Rao',      dept: 'ENTC', year: 'SE', jy: 2024, num: '001', motherName: 'Usha',     birthDate: '190505' },
+    { firstName: 'Aditya',    lastName: 'Mehta',    dept: 'IT',   year: 'SE', jy: 2024, num: '001', motherName: 'Shobha',   birthDate: '230605' },
+    { firstName: 'Pooja',     lastName: 'Singh',    dept: 'MECH', year: 'SE', jy: 2024, num: '001', motherName: 'Anita',    birthDate: '110505' },
     // TE — joined 2023
-    { firstName: 'Karan',     lastName: 'Verma',    dept: 'COMP', year: 'TE', jy: 2023, num: '001' },
-    { firstName: 'Ishaan',    lastName: 'Thakur',   dept: 'ENTC', year: 'TE', jy: 2023, num: '001' },
-    { firstName: 'Divya',     lastName: 'Gupta',    dept: 'ENTC', year: 'TE', jy: 2023, num: '002' },
-    { firstName: 'Siddharth', lastName: 'Bhat',     dept: 'IT',   year: 'TE', jy: 2023, num: '001' },
-    { firstName: 'Meera',     lastName: 'Pillai',   dept: 'MECH', year: 'TE', jy: 2023, num: '001' },
+    { firstName: 'Karan',     lastName: 'Verma',    dept: 'COMP', year: 'TE', jy: 2023, num: '001', motherName: 'Nirmala',  birthDate: '040304' },
+    { firstName: 'Ishaan',    lastName: 'Thakur',   dept: 'ENTC', year: 'TE', jy: 2023, num: '001', motherName: 'Sudha',    birthDate: '160304' },
+    { firstName: 'Divya',     lastName: 'Gupta',    dept: 'ENTC', year: 'TE', jy: 2023, num: '002', motherName: 'Pallavi',  birthDate: '250304' },
+    { firstName: 'Siddharth', lastName: 'Bhat',     dept: 'IT',   year: 'TE', jy: 2023, num: '001', motherName: 'Vandana',  birthDate: '080403' },
+    { firstName: 'Meera',     lastName: 'Pillai',   dept: 'MECH', year: 'TE', jy: 2023, num: '001', motherName: 'Radha',    birthDate: '300303' },
     // BE — joined 2022
-    { firstName: 'Tanvi',     lastName: 'Sawant',   dept: 'COMP', year: 'BE', jy: 2022, num: '001' },
-    { firstName: 'Nikhil',    lastName: 'Kadam',    dept: 'ENTC', year: 'BE', jy: 2022, num: '001' },
-    { firstName: 'Shreya',    lastName: 'Pandey',   dept: 'IT',   year: 'BE', jy: 2022, num: '001' },
-    { firstName: 'Yash',      lastName: 'Patil',    dept: 'IT',   year: 'BE', jy: 2022, num: '002' },
-    { firstName: 'Riya',      lastName: 'Gaikwad',  dept: 'MECH', year: 'BE', jy: 2022, num: '001' },
+    { firstName: 'Tanvi',     lastName: 'Sawant',   dept: 'COMP', year: 'BE', jy: 2022, num: '001', motherName: 'Swapna',   birthDate: '290703' },
+    { firstName: 'Nikhil',    lastName: 'Kadam',    dept: 'ENTC', year: 'BE', jy: 2022, num: '001', motherName: 'Poonam',   birthDate: '140302' },
+    { firstName: 'Shreya',    lastName: 'Pandey',   dept: 'IT',   year: 'BE', jy: 2022, num: '001', motherName: 'Madhuri',  birthDate: '050203' },
+    { firstName: 'Yash',      lastName: 'Patil',    dept: 'IT',   year: 'BE', jy: 2022, num: '002', motherName: 'Kalpana',  birthDate: '170203' },
+    { firstName: 'Riya',      lastName: 'Gaikwad',  dept: 'MECH', year: 'BE', jy: 2022, num: '001', motherName: 'Seema',    birthDate: '220302' },
   ];
 
   const students = await User.insertMany(
-    studentDefs.map(({ firstName, lastName, dept, year, jy, num }) => {
+    await Promise.all(studentDefs.map(async ({ firstName, lastName, dept, year, jy, num, motherName, birthDate }) => {
       const rollNumber = `${year.toLowerCase()}${jy}${dept.toLowerCase()}${num}`;
+      const password = `${motherName.toLowerCase()}@${birthDate}`;
+      const passwordHash = await bcrypt.hash(password, 10);
       return {
         rollNumber,
         email: `${firstName.toLowerCase()}.${rollNumber}@sinhgad.edu`,
@@ -91,9 +91,11 @@ async function seed() {
         year,
         joinYear: jy,
         mustChangePassword: true,
+        motherName,
+        birthDate,
         college: COLLEGE,
       };
-    })
+    }))
   );
 
   const [
