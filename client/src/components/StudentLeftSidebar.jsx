@@ -125,8 +125,9 @@ const StudentLeftSidebar = ({ user: initialUser }) => {
                             </button>
                             <button
                                 onClick={() => {
-                                    localStorage.removeItem('userRole');
+                                    localStorage.removeItem('token');
                                     localStorage.removeItem('user');
+                                    localStorage.removeItem('userRole');
                                     window.location.href = '/';
                                 }}
                                 className="flex-1 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors"

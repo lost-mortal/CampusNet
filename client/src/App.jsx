@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import LandingPage from './pages/landing/LandingPage';
 import Search from './pages/student/Search';
 import DashboardLayout from './layout/DashboardLayout';
@@ -27,6 +27,20 @@ import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import ManageUsers from './pages/admin/ManageUsers';
 import AdminSettings from './pages/admin/AdminSettings';
 
+function RequireAuth({ adminOnly = false }) {
+  const token = localStorage.getItem('token');
+  if (!token) return <Navigate to="/" replace />;
+  if (adminOnly) {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.role !== 'admin') return <Navigate to="/home" replace />;
+    } catch {
+      return <Navigate to="/" replace />;
+    }
+  }
+  return <Outlet />;
+}
+
 function App() {
   return (
     <Router>
@@ -34,58 +48,48 @@ function App() {
         <Route path="/" element={<LandingPage />} />
 
         {/* Student Dashboard Routes */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/home" element={<StudentFeed />} />
-          <Route path="/profile" element={<StudentProfile />} />
-          <Route path="/announcements" element={<Announcements />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/notifications" element={<Notifications />} />
-        </Route>
+        <Route element={<RequireAuth />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/home" element={<StudentFeed />} />
+            <Route path="/profile" element={<StudentProfile />} />
+            <Route path="/announcements" element={<Announcements />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/notifications" element={<Notifications />} />
+          </Route>
 
-        {/* Club Dashboard Routes */}
-        <Route path="/club" element={<ErrorBoundary><ClubLayout /></ErrorBoundary>}>
-          {/* Default to chat if someone just goes to /club */}
-          <Route index element={<Navigate to="chat" replace />} />
+          {/* Club Dashboard Routes */}
+          <Route path="/club" element={<ErrorBoundary><ClubLayout /></ErrorBoundary>}>
+            <Route index element={<Navigate to="chat" replace />} />
+            <Route path="chat" element={<ChannelChat />} />
+            <Route path="chat/:channelId" element={<ChannelChat />} />
+            <Route path="profile" element={<ClubProfile />} />
+            <Route path="stats/:eventId" element={<EventStats />} />
+            <Route path="insights" element={<AIInsights />} />
+          </Route>
 
-          {/* The Main Chat Interface (for Members) */}
-          <Route path="chat" element={<ChannelChat />} />
-          <Route path="chat/:channelId" element={<ChannelChat />} />
-
-          {/* The Club Profile/Settings (for Presidents) */}
-          <Route path="profile" element={<ClubProfile />} />
-          <Route path="stats/:eventId" element={<EventStats />} />
-          <Route path="insights" element={<AIInsights />} />
-        </Route>
-
-        {/* Community Routes */}
-        <Route path="/community/:id" element={<ErrorBoundary><CommunityLayout /></ErrorBoundary>}>
-          {/* Default to general chat */}
-          <Route index element={<Navigate to="chat/general" replace />} />
-
-          {/* Chat Channels */}
-          <Route path="chat/announcements" element={<AnnouncementsChannel />} />
-          <Route path="chat/general" element={<GeneralChannel />} />
-
-          {/* Discussion Forum */}
-          <Route path="forum/discussions" element={<DiscussionBoard />} />
-          <Route path="forum/discussions/:postId" element={<PostDetail />} />
-
-          {/* Collaboration Requests */}
-          <Route path="collabs" element={<CommunityCollabs />} />
+          {/* Community Routes */}
+          <Route path="/community/:id" element={<ErrorBoundary><CommunityLayout /></ErrorBoundary>}>
+            <Route index element={<Navigate to="chat/general" replace />} />
+            <Route path="chat/announcements" element={<AnnouncementsChannel />} />
+            <Route path="chat/general" element={<GeneralChannel />} />
+            <Route path="forum/discussions" element={<DiscussionBoard />} />
+            <Route path="forum/discussions/:postId" element={<PostDetail />} />
+            <Route path="collabs" element={<CommunityCollabs />} />
+          </Route>
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<ErrorBoundary><AdminLayout /></ErrorBoundary>}>
-          {/* Default to dashboard if someone just goes to /admin */}
-          <Route index element={<Navigate to="dashboard" replace />} />
-
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="clubs" element={<ManageClubs />} />
-          <Route path="communities" element={<ManageCommunities />} />
-          <Route path="announcements" element={<AdminAnnouncements />} />
-          <Route path="users" element={<ManageUsers />} />
-          <Route path="settings" element={<AdminSettings />} />
+        <Route element={<RequireAuth adminOnly={true} />}>
+          <Route path="/admin" element={<ErrorBoundary><AdminLayout /></ErrorBoundary>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="clubs" element={<ManageClubs />} />
+            <Route path="communities" element={<ManageCommunities />} />
+            <Route path="announcements" element={<AdminAnnouncements />} />
+            <Route path="users" element={<ManageUsers />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
         </Route>
       </Routes>
     </Router>
