@@ -34,6 +34,7 @@ app.get('/api/test', (req, res) => {
 
 app.use('/api/health', require('./routes/health'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/posts', require('./routes/posts'));
 app.use('/api/dev', require('./routes/dev')); // TEMP: remove after Phase 1.3
 
 // Central error handler
