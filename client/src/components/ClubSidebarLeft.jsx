@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Plus, XCircle, Users, CalendarDays } from 'lucide-react';
 import axios from 'axios';
+import CreatePostModal from '../pages/club/CreatePostModal';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -15,16 +17,35 @@ const ClubSidebarLeft = () => {
   const [clubData, setClubData] = useState(null);
   const [channelsOpen, setChannelsOpen] = useState(true);
   const [liveOpsOpen, setLiveOpsOpen] = useState(true);
+  const [createModal, setCreateModal] = useState(null); // 'Recruitment' | 'Event' | null
+  const [closingId, setClosingId] = useState(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios.get(`${API}/api/clubs/my`, { headers: { Authorization: `Bearer ${token}` } })
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const fetchClubData = useCallback(() => {
+    axios.get(`${API}/api/clubs/my`, { headers })
       .then(r => setClubData(r.data))
       .catch(console.error);
   }, []);
 
+  useEffect(() => { fetchClubData(); }, [fetchClubData]);
+
+  const handleCloseRecruitment = async (postId) => {
+    setClosingId(postId);
+    try {
+      await axios.patch(`${API}/api/posts/${postId}/close`, {}, { headers });
+      fetchClubData();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setClosingId(null);
+    }
+  };
+
   const club = clubData?.club;
-  const posts = clubData?.posts || [];
+  const recruitment = clubData?.recruitment;
+  const events = clubData?.events || [];
 
   return (
     <div className="h-full w-full flex flex-col bg-zinc-900 border-r border-white/10 text-gray-300 font-sans">
@@ -78,47 +99,147 @@ const ClubSidebarLeft = () => {
           )}
         </div>
 
-        {/* Live Ops */}
-        {posts.length > 0 && (
-          <div className="px-3">
-            <div
-              onClick={() => setLiveOpsOpen(!liveOpsOpen)}
-              className="flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest cursor-pointer hover:text-gray-300 transition-colors"
-            >
-              <span>Live Operations</span>
-              <span className={`transform transition-transform duration-200 ${liveOpsOpen ? 'rotate-180' : ''}`}>▼</span>
-            </div>
-            {liveOpsOpen && (
-              <div className="mt-1 space-y-0.5">
-                {posts.map(post => {
-                  const to = post.type === 'recruitment'
-                    ? `/club/recruitment/${post._id}`
-                    : `/club/stats/${post._id}`;
-                  const dotColor = post.type === 'recruitment' ? 'bg-amber-500' : 'bg-blue-500';
-                  const label = post.type === 'recruitment'
-                    ? `${post.count} Application${post.count !== 1 ? 's' : ''}`
-                    : 'Registrations';
-                  return (
-                    <NavLink
-                      key={post._id}
-                      to={to}
-                      className={({ isActive }) => `
-                        flex flex-col px-3 py-2.5 rounded-lg text-sm group transition-all border border-transparent
-                        ${isActive ? 'bg-amber-600/10 border-amber-500/20' : 'hover:bg-white/5 hover:border-white/5'}
-                      `}
+        {/* Live Operations */}
+        <div className="px-3">
+          <div
+            onClick={() => setLiveOpsOpen(!liveOpsOpen)}
+            className="flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest cursor-pointer hover:text-gray-300 transition-colors"
+          >
+            <span>Live Operations</span>
+            <span className={`transform transition-transform duration-200 ${liveOpsOpen ? 'rotate-180' : ''}`}>▼</span>
+          </div>
+
+          {liveOpsOpen && (
+            <div className="mt-1 space-y-4">
+
+              {/* — Recruitment subsection — */}
+              <div>
+                <div className="flex items-center gap-1.5 px-2 mb-1.5">
+                  <Users size={10} className="text-amber-500/70" />
+                  <span className="text-[10px] font-semibold text-amber-500/70 uppercase tracking-wider">Recruitment</span>
+                </div>
+
+                {!recruitment && (
+                  /* No recruitment post ever created */
+                  club?.isPresident ? (
+                    <button
+                      onClick={() => setCreateModal('Recruitment')}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-amber-500/70 border border-dashed border-amber-500/20 hover:border-amber-500/40 hover:bg-amber-500/5 hover:text-amber-400 transition-all"
                     >
-                      <span className="font-medium truncate text-gray-300 group-hover:text-white mb-1">{post.title}</span>
+                      <Plus size={14} />
+                      <span>Create Recruitment Post</span>
+                    </button>
+                  ) : (
+                    <p className="px-2 text-xs text-gray-600">No active recruitment.</p>
+                  )
+                )}
+
+                {recruitment?.isActive && (
+                  /* Active recruitment post */
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 overflow-hidden">
+                    <NavLink
+                      to={`/club/recruitment/${recruitment._id}`}
+                      className={({ isActive }) =>
+                        `flex flex-col px-3 py-2.5 transition-colors ${isActive ? 'bg-amber-500/10' : 'hover:bg-amber-500/10'}`
+                      }
+                    >
+                      <span className="font-medium text-sm text-gray-200 truncate mb-1">{recruitment.title}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></span>
-                        <span className="text-xs text-gray-500 font-mono">{label}</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span className="text-xs text-amber-500/80 font-mono">
+                          {recruitment.count} Application{recruitment.count !== 1 ? 's' : ''}
+                        </span>
                       </div>
                     </NavLink>
-                  );
-                })}
+                    {club?.isPresident && (
+                      <button
+                        onClick={() => handleCloseRecruitment(recruitment._id)}
+                        disabled={closingId === recruitment._id}
+                        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 border-t border-amber-500/10 transition-colors disabled:opacity-50"
+                      >
+                        <XCircle size={12} />
+                        {closingId === recruitment._id ? 'Closing…' : 'Close Applications'}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {recruitment && !recruitment.isActive && (
+                  /* Closed recruitment post */
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800/50 border border-white/5 opacity-50">
+                      <span className="text-xs text-gray-500 truncate flex-1">{recruitment.title}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-500 shrink-0">Closed</span>
+                    </div>
+                    {club?.isPresident && (
+                      <button
+                        onClick={() => setCreateModal('Recruitment')}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-amber-500/70 border border-dashed border-amber-500/20 hover:border-amber-500/40 hover:bg-amber-500/5 hover:text-amber-400 transition-all"
+                      >
+                        <Plus size={14} />
+                        <span>New Recruitment Round</span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
+
+              {/* — Events subsection — */}
+              <div>
+                <div className="flex items-center justify-between px-2 mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <CalendarDays size={10} className="text-blue-500/70" />
+                    <span className="text-[10px] font-semibold text-blue-500/70 uppercase tracking-wider">Events</span>
+                  </div>
+                  {club?.isPresident && (
+                    <button
+                      onClick={() => setCreateModal('Event')}
+                      className="w-5 h-5 rounded flex items-center justify-center text-blue-500/50 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                      title="Create Event"
+                    >
+                      <Plus size={13} />
+                    </button>
+                  )}
+                </div>
+
+                {events.length === 0 ? (
+                  club?.isPresident ? (
+                    <button
+                      onClick={() => setCreateModal('Event')}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-blue-500/70 border border-dashed border-blue-500/20 hover:border-blue-500/40 hover:bg-blue-500/5 hover:text-blue-400 transition-all"
+                    >
+                      <Plus size={14} />
+                      <span>Create Event</span>
+                    </button>
+                  ) : (
+                    <p className="px-2 text-xs text-gray-600">No upcoming events.</p>
+                  )
+                ) : (
+                  <div className="space-y-0.5">
+                    {events.map(event => (
+                      <NavLink
+                        key={event._id}
+                        to={`/club/stats/${event._id}`}
+                        className={({ isActive }) => `
+                          flex flex-col px-3 py-2.5 rounded-lg text-sm group transition-all border border-transparent
+                          ${isActive ? 'bg-blue-600/10 border-blue-500/20' : 'hover:bg-white/5 hover:border-white/5'}
+                        `}
+                      >
+                        <span className="font-medium truncate text-gray-300 group-hover:text-white mb-0.5">{event.title}</span>
+                        {event.eventDate && (
+                          <span className="text-xs text-gray-600 font-mono">
+                            {new Date(event.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </span>
+                        )}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+        </div>
 
         {/* AI Insights */}
         <div className="px-3">
@@ -153,6 +274,13 @@ const ClubSidebarLeft = () => {
           Exit Club View
         </button>
       </div>
+
+      <CreatePostModal
+        isOpen={!!createModal}
+        onClose={() => setCreateModal(null)}
+        type={createModal}
+        onCreated={fetchClubData}
+      />
     </div>
   );
 };

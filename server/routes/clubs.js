@@ -9,7 +9,7 @@ const CLUB_ICONS = {
   'AI/ML Club': '🧠', 'Sports Club': '🏅',
 };
 
-// GET /api/clubs/my — current user's club + active posts (for sidebar)
+// GET /api/clubs/my — current user's club data for sidebar
 router.get('/my', requireAuth, async (req, res, next) => {
   try {
     const club = await Club.findOne({
@@ -17,14 +17,18 @@ router.get('/my', requireAuth, async (req, res, next) => {
     });
     if (!club) return res.status(404).json({ error: 'No club found' });
 
-    const posts = await Post.find({ club: club._id, isActive: true }).sort({ createdAt: -1 });
+    // Latest recruitment post regardless of active status
+    const recruitmentPost = await Post.findOne({ club: club._id, type: 'Recruitment' })
+      .sort({ createdAt: -1 });
 
-    const postsWithCounts = await Promise.all(posts.map(async p => {
-      const count = p.type === 'Recruitment'
-        ? await Application.countDocuments({ post: p._id })
-        : 0;
-      return { _id: p._id, type: p.type.toLowerCase(), title: p.title, count };
-    }));
+    // All active event posts sorted by event date
+    const eventPosts = await Post.find({ club: club._id, type: 'Event', isActive: true })
+      .sort({ eventDate: 1 });
+
+    let recruitmentCount = 0;
+    if (recruitmentPost) {
+      recruitmentCount = await Application.countDocuments({ post: recruitmentPost._id });
+    }
 
     res.json({
       club: {
@@ -34,7 +38,17 @@ router.get('/my', requireAuth, async (req, res, next) => {
         isPresident: club.president.toString() === req.user._id.toString(),
         memberCount: club.members.length,
       },
-      posts: postsWithCounts,
+      recruitment: recruitmentPost ? {
+        _id: recruitmentPost._id,
+        title: recruitmentPost.title,
+        isActive: recruitmentPost.isActive,
+        count: recruitmentCount,
+      } : null,
+      events: eventPosts.map(p => ({
+        _id: p._id,
+        title: p.title,
+        eventDate: p.eventDate,
+      })),
     });
   } catch (err) {
     next(err);

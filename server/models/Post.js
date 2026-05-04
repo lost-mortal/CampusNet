@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema({
   // Event fields
   eventDate: { type: Date },
   venue: { type: String, default: '' },
+  image: { type: String, default: '' },
   paymentConfig: {
     enabled: { type: Boolean, default: false },
     recipient: { upiId: String, name: String },

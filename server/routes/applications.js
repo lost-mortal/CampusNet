@@ -13,14 +13,11 @@ router.post('/posts/:id/apply', requireAuth, async (req, res, next) => {
     }
     if (!post.isActive) return res.status(400).json({ error: 'Applications are closed' });
 
-    const club = await Club.findById(post.club);
-    if (!club) return res.status(404).json({ error: 'Club not found' });
-
-    const uid = req.user._id.toString();
-    const isMember = club.members.map(m => m.toString()).includes(uid);
-    const isPresident = club.president.toString() === uid;
-    if (isMember || isPresident) {
-      return res.status(400).json({ error: 'You are already a member of this club' });
+    const existingClub = await Club.findOne({
+      $or: [{ president: req.user._id }, { members: req.user._id }],
+    });
+    if (existingClub) {
+      return res.status(400).json({ error: `You are already a member of ${existingClub.name}` });
     }
 
     const application = await Application.create({
@@ -97,6 +94,13 @@ router.patch('/applications/:id/accept', requireAuth, async (req, res, next) => 
 
     await Club.findByIdAndUpdate(application.club, {
       $addToSet: { members: application.applicant },
+    });
+
+    // Remove this student's pending applications to any other clubs
+    await Application.deleteMany({
+      applicant: application.applicant,
+      club: { $ne: application.club },
+      status: 'pending',
     });
 
     res.json({ _id: application._id, status: application.status });
