@@ -9,8 +9,8 @@ Do not delete history. Append. The full build history lives here so any new chat
 ## Current position
 
 **Day:** 1
-**Last phase passed:** 1.3 (auth)
-**Next phase to start:** 1.4 (deployment)
+**Last phase passed:** 2.1 (recruitment workflow)
+**Next phase to start:** 2.2 (event workflow + QR)
 **Blocked on:** nothing
 
 ---
@@ -23,11 +23,11 @@ Mark each phase: ⏳ pending · 🔨 in progress · ✅ passed gate · ❌ block
 - ✅ 1.1 Backend skeleton — `/api/health` returns `{ status: 'ok', dbConnected: true }`
 - ✅ 1.2 Seed data — 20 students / 5 clubs / 5 communities / posts / applications
 - ✅ 1.3 Auth — JWT + first-login password change + replace persona modal
-- 🔨 1.4 Deployment — Vercel frontend + Render backend
-- ⏳ 1.5 Wire feed — replace mockData.js with /api/posts
+- ✅ 1.4 Deployment — Vercel frontend + Render backend
+- ✅ 1.5 Wire feed — replace mockData.js with /api/posts
 
 ### Day 2 — The engine
-- ⏳ 2.1 Recruitment workflow — apply / accept / reject / membership flip
+- ✅ 2.1 Recruitment workflow — apply / accept / reject / membership flip
 - ⏳ 2.2 Event workflow + QR — register / ticket / scanner / attendance
 - ⏳ 2.3 Live Ops stats UI — real aggregation
 - ⏳ 2.4 AI Search — Gemini-powered with seeded context
@@ -45,6 +45,10 @@ Mark each phase: ⏳ pending · 🔨 in progress · ✅ passed gate · ❌ block
 ## Decisions log (only NEW ones not in PLAN.md)
 
 - 2026-04-28: Atlas URI must include database name `/campusnet` before `?` so Mongoose writes to correct DB, not default `test`
+- 2026-05-04: 1.5 ActionModal does not POST on Apply/Register — UI transitions to success state locally; real POST wired in 2.1/2.2 per plan
+- 2026-05-04: Club/Community models must be explicitly required in posts route so Mongoose can populate refs across models
+- 2026-05-04: No dedicated recruitment stats page existed — created RecruitmentApplicants.jsx at /club/recruitment/:postId; ClubSidebarLeft now fetches real club from GET /api/clubs/my and links recruitment posts there
+- 2026-05-04: DashboardLayout now calls GET /api/auth/me on mount to refresh user profile so club membership shows in sidebar immediately after acceptance without re-login
 
 (Append new decisions here as you build. One line each.)
 

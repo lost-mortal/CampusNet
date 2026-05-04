@@ -37,6 +37,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/dev', require('./routes/dev')); // TEMP: remove after Phase 1.3
+app.use('/api', require('./routes/applications'));
+app.use('/api/clubs', require('./routes/clubs'));
 
 // Central error handler
 app.use((err, req, res, next) => {

@@ -1,19 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Calendar, MapPin, Users, Briefcase, Share2 } from 'lucide-react';
+import { X, Check, Calendar, MapPin, Users, Briefcase, Share2, Loader } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import axios from 'axios';
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ActionModal = ({ isOpen, onClose, item }) => {
-    const [step, setStep] = useState('initial'); // 'initial', 'success', 'qr'
+    const [step, setStep] = useState('initial'); // 'initial', 'success', 'qr', 'error'
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     // Reset step when modal opens
     useEffect(() => {
-        if (isOpen) setStep('initial');
+        if (isOpen) { setStep('initial'); setErrorMsg(''); }
     }, [isOpen]);
 
     if (!isOpen || !item) return null;
 
-    const handleAction = () => {
+    const handleAction = async () => {
+        if (item.type === 'recruitment') {
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token');
+                await axios.post(`${API}/api/posts/${item._id}/apply`, {}, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setStep('success');
+            } catch (err) {
+                setErrorMsg(err.response?.data?.error || 'Something went wrong');
+                setStep('error');
+            } finally {
+                setLoading(false);
+            }
+            return;
+        }
         if (item.type === 'event') {
             setStep('qr');
         } else {
@@ -107,6 +128,21 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                 );
             }
 
+            if (step === 'error') {
+                return (
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mb-4 border border-red-500/30">
+                            <X size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Could Not Apply</h3>
+                        <p className="text-gray-400 text-sm mb-6">{errorMsg}</p>
+                        <button onClick={onClose} className="w-full py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-colors">
+                            Close
+                        </button>
+                    </div>
+                );
+            }
+
             return (
                 <div>
                     <div className="flex items-center gap-4 mb-6">
@@ -126,9 +162,10 @@ const ActionModal = ({ isOpen, onClose, item }) => {
 
                     <button
                         onClick={handleAction}
-                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+                        disabled={loading}
+                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                        Submit Profile
+                        {loading ? <><Loader size={16} className="animate-spin" /> Submitting…</> : 'Submit Profile'}
                     </button>
                 </div>
             );

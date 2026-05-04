@@ -12,6 +12,7 @@ import ClubProfile from './pages/club/ClubProfile';
 import ChannelChat from './pages/club/ChannelChat';
 import EventStats from './pages/club/EventStats';
 import AIInsights from './pages/club/AIInsights';
+import RecruitmentApplicants from './pages/club/RecruitmentApplicants';
 import CommunityLayout from './layout/CommunityLayout';
 import AnnouncementsChannel from './pages/community/AnnouncementsChannel';
 import GeneralChannel from './pages/community/GeneralChannel';
@@ -65,6 +66,7 @@ function App() {
             <Route path="chat/:channelId" element={<ChannelChat />} />
             <Route path="profile" element={<ClubProfile />} />
             <Route path="stats/:eventId" element={<EventStats />} />
+            <Route path="recruitment/:postId" element={<RecruitmentApplicants />} />
             <Route path="insights" element={<AIInsights />} />
           </Route>
 
