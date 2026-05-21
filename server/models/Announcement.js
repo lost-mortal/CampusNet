@@ -6,6 +6,7 @@ const announcementSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   targetDepartments: [{ type: String, enum: ['COMP', 'ENTC', 'IT', 'MECH', 'ALL'] }],
   targetYears: [{ type: String, enum: ['FE', 'SE', 'TE', 'BE', 'ALL'] }],
+  priority: { type: String, enum: ['normal', 'high'], default: 'normal' },
   college: { type: String, default: 'SINHGAD_ENGINEERING' },
 }, { timestamps: true });
 

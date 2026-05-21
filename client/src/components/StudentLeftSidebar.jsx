@@ -1,28 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { Home, Megaphone, Search, Bell, Settings, Zap, Users, ChevronRight, LogOut } from 'lucide-react';
+import ReactDOM from 'react-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
+import { Home, Megaphone, Search, Bell, Settings, Zap, Users, ChevronRight, LogOut, Ticket } from 'lucide-react';
 import { USER_DATA } from '../data/mockData';
+import { getUser, clearSession } from '../lib/session';
+import api from '../lib/api';
 
 const StudentLeftSidebar = ({ user: initialUser }) => {
     const [user, setUser] = useState(initialUser);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [counts, setCounts] = useState({ notifications: 0, announcements: 0 });
+    const location = useLocation();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Failed to parse user from localStorage", e);
-            }
-        }
+        const stored = getUser();
+        if (stored) setUser(stored);
     }, []);
+
+    // Poll unread counts every 15s
+    useEffect(() => {
+        let mounted = true;
+        const fetchCounts = () => {
+            api.get('/api/notifications/unread-counts')
+                .then(r => { if (mounted) setCounts(r.data || { notifications: 0, announcements: 0 }); })
+                .catch(() => {});
+        };
+        fetchCounts();
+        const id = setInterval(fetchCounts, 15000);
+        return () => { mounted = false; clearInterval(id); };
+    }, []);
+
+    // Clear notifications badge when Notifications page opens
+    useEffect(() => {
+        if (location.pathname === '/notifications') {
+            setCounts(c => ({ ...c, notifications: 0 }));
+        }
+    }, [location.pathname]);
+
+    // Clear announcements badge when Announcements page opens
+    useEffect(() => {
+        if (location.pathname === '/announcements') {
+            api.patch('/api/notifications/announcements-read').catch(() => {});
+            setCounts(c => ({ ...c, announcements: 0 }));
+        }
+    }, [location.pathname]);
 
     const navItems = [
         { icon: <Home size={20} />, label: "Home", path: "/home" },
-        { icon: <Megaphone size={20} />, label: "Announcements", path: "/announcements" },
+        { icon: <Megaphone size={20} />, label: "Announcements", path: "/announcements", badge: counts.announcements },
         { icon: <Search size={20} />, label: "Search", path: '/search' },
-        { icon: <Bell size={20} />, label: "Notifications", path: "/notifications" },
+        { icon: <Bell size={20} />, label: "Notifications", path: "/notifications", badge: counts.notifications },
+        { icon: <Ticket size={20} />, label: "Activity", path: "/profile?tab=activity" },
         { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
     ];
 
@@ -43,8 +71,13 @@ const StudentLeftSidebar = ({ user: initialUser }) => {
                         to={item.path}
                         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group hover:bg-white/5 hover:text-gray-200 text-gray-400`}
                     >
-                        <span className="text-gray-500 group-hover:text-gray-300">
+                        <span className="relative text-gray-500 group-hover:text-gray-300">
                             {item.icon}
+                            {item.badge > 0 && (
+                                <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border border-black">
+                                    {item.badge > 99 ? '99+' : item.badge}
+                                </span>
+                            )}
                         </span>
                         <span>{item.label}</span>
                     </Link>
@@ -110,9 +143,9 @@ const StudentLeftSidebar = ({ user: initialUser }) => {
                 </button>
             </div>
 
-            {/* Logout Confirmation Modal */}
-            {showLogoutConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            {/* Logout Confirmation Modal — portaled to body to escape sidebar stacking context */}
+            {showLogoutConfirm && ReactDOM.createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#1a1a1a] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
                         <h3 className="text-xl font-bold text-white mb-2">Sign Out?</h3>
                         <p className="text-gray-400 mb-6">Are you sure you want to end your session?</p>
@@ -125,9 +158,7 @@ const StudentLeftSidebar = ({ user: initialUser }) => {
                             </button>
                             <button
                                 onClick={() => {
-                                    localStorage.removeItem('token');
-                                    localStorage.removeItem('user');
-                                    localStorage.removeItem('userRole');
+                                    clearSession();
                                     window.location.href = '/';
                                 }}
                                 className="flex-1 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors"
@@ -136,7 +167,8 @@ const StudentLeftSidebar = ({ user: initialUser }) => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </aside>
     );

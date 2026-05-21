@@ -114,3 +114,6 @@ dist
 
 # Windows Thumbnail cache
 Thumbs.db
+
+# Claude Code local settings (not shared)
+.claude/

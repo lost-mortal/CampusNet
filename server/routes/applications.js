@@ -3,6 +3,7 @@ const Post = require('../models/Post');
 const Club = require('../models/Club');
 const Application = require('../models/Application');
 const requireAuth = require('../middleware/auth');
+const { notify } = require('../lib/notify');
 
 // POST /api/posts/:id/apply
 router.post('/posts/:id/apply', requireAuth, async (req, res, next) => {
@@ -12,6 +13,9 @@ router.post('/posts/:id/apply', requireAuth, async (req, res, next) => {
       return res.status(404).json({ error: 'Recruitment post not found' });
     }
     if (!post.isActive) return res.status(400).json({ error: 'Applications are closed' });
+    if (post.registrationDeadline && new Date() > new Date(post.registrationDeadline)) {
+      return res.status(400).json({ error: 'Application deadline has passed' });
+    }
 
     const existingClub = await Club.findOne({
       $or: [{ president: req.user._id }, { members: req.user._id }],
@@ -26,6 +30,11 @@ router.post('/posts/:id/apply', requireAuth, async (req, res, next) => {
       club: post.club,
     });
 
+    try {
+      const club = await Club.findById(post.club).select('name');
+      await notify(req.user._id, `You applied to ${club?.name || 'the club'} — good luck!`, 'recruitment_applied');
+    } catch (_e) {}
+
     res.status(201).json(application);
   } catch (err) {
     if (err.code === 11000) return res.status(409).json({ error: 'You have already applied' });
@@ -33,13 +42,16 @@ router.post('/posts/:id/apply', requireAuth, async (req, res, next) => {
   }
 });
 
-// GET /api/posts/:id/applicants — president of that club only
+// GET /api/posts/:id/applicants — any club member (read) or president (accept/reject)
 router.get('/posts/:id/applicants', requireAuth, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id).populate('club');
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
-    if (post.club.president.toString() !== req.user._id.toString()) {
+    const uid = req.user._id.toString();
+    const isPresident = post.club.president.toString() === uid;
+    const isMember = post.club.members.some(m => m.toString() === uid);
+    if (!isPresident && !isMember) {
       return res.status(403).json({ error: 'Not authorized' });
     }
 
@@ -103,6 +115,11 @@ router.patch('/applications/:id/accept', requireAuth, async (req, res, next) => 
       status: 'pending',
     });
 
+    try {
+      const clubName = application.post?.club?.name || 'the club';
+      await notify(application.applicant, `Your application to ${clubName} was accepted — welcome to the club!`, 'recruitment_accepted');
+    } catch (_e) {}
+
     res.json({ _id: application._id, status: application.status });
   } catch (err) {
     next(err);
@@ -124,6 +141,11 @@ router.patch('/applications/:id/reject', requireAuth, async (req, res, next) => 
 
     application.status = 'rejected';
     await application.save();
+
+    try {
+      const clubName = application.post?.club?.name || 'the club';
+      await notify(application.applicant, `Your application to ${clubName} was not accepted this time.`, 'recruitment_rejected');
+    } catch (_e) {}
 
     res.json({ _id: application._id, status: application.status });
   } catch (err) {

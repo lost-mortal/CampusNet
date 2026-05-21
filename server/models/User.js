@@ -14,8 +14,13 @@ const userSchema = new mongoose.Schema({
   motherName: { type: String, default: '' },
   birthDate: { type: String, default: '' }, // DDMMYY
   bio: { type: String, default: '' },
+  skills: [{ type: String }],
   profilePic: { type: String, default: '' },
+  bannerImage: { type: String, default: '' },
   college: { type: String, default: 'SINHGAD_ENGINEERING' },
+  lastAnnouncementsReadAt: { type: Date, default: null },
+  isRestricted: { type: Boolean, default: false },
+  restrictionReason: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

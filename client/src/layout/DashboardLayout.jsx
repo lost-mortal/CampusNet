@@ -3,21 +3,22 @@ import { Outlet } from 'react-router-dom';
 import axios from 'axios';
 import StudentLeftSidebar from '../components/StudentLeftSidebar';
 import StudentRightSidebar from '../components/StudentRightSidebar';
+import { getToken, getUser, setUser as persistUser } from '../lib/session';
+import { usePresenceSocket } from '../lib/presence';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL;
 
 const DashboardLayout = () => {
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch { return {}; }
-  });
+  usePresenceSocket();
+  const [user, setUser] = useState(() => getUser() || {});
 
   // Refresh profile from server on mount so club membership is always current
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) return;
     axios.get(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => {
-        localStorage.setItem('user', JSON.stringify(r.data.user));
+        persistUser(r.data.user);
         setUser(r.data.user);
       })
       .catch(console.error);

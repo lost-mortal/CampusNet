@@ -8,12 +8,20 @@ const postSchema = new mongoose.Schema({
   club: { type: mongoose.Schema.Types.ObjectId, ref: 'Club' },
   community: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' },
   tag: { type: String, enum: ['Technical', 'Cultural', 'Sports', 'Recruitment', 'Creative', 'Other'] },
+  // Collab posts only — free-form skill tags
+  skills: [{ type: String }],
   // Recruitment: only one active per club at a time
   isActive: { type: Boolean, default: true },
   // Event fields
   eventDate: { type: Date },
   venue: { type: String, default: '' },
   image: { type: String, default: '' },
+  // Last date a student can register (event) or apply (recruitment)
+  registrationDeadline: { type: Date },
+  // Paid event flow
+  isPaid: { type: Boolean, default: false },
+  amount: { type: Number, default: 0 },
+  paymentQrImage: { type: String, default: '' },
   paymentConfig: {
     enabled: { type: Boolean, default: false },
     recipient: { upiId: String, name: String },
