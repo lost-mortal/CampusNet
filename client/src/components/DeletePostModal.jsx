@@ -8,16 +8,16 @@ const API = import.meta.env.VITE_API_URL;
 
 // Confirm + cascade modal used by the club sidebar's event/recruitment lists
 // and by EventStats / RecruitmentApplicants. Shared so the messaging stays
-// consistent â€” particularly the approved-payment warning.
+// consistent — particularly the approved-payment warning.
 //
 // Props:
-//   open                    â€” boolean
-//   postTitle               â€” string
-//   postType                â€” 'Event' | 'Recruitment'
-//   postId                  â€” string
-//   approvedPaymentsCount   â€” number (Events only; safe to pass 0 for Recruitments)
-//   onCancel                â€” () => void
-//   onDeleted               â€” (payload: { warning?: string }) => void
+//   open                    — boolean
+//   postTitle               — string
+//   postType                — 'Event' | 'Recruitment'
+//   postId                  — string
+//   approvedPaymentsCount   — number (Events only; safe to pass 0 for Recruitments)
+//   onCancel                — () => void
+//   onDeleted               — (payload: { warning?: string }) => void
 const DeletePostModal = ({
   open,
   postTitle,

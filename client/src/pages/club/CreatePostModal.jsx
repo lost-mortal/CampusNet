@@ -94,7 +94,7 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Off-screen host for html5-qrcode.scanFile â€” required to exist in DOM */}
+          {/* Off-screen host for html5-qrcode.scanFile — required to exist in DOM */}
           <div id="qr-validator" style={{ position: 'absolute', left: '-9999px', top: 0, width: 0, height: 0, overflow: 'hidden' }} />
 
           <motion.div
@@ -136,7 +136,7 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
                       type="text"
                       value={title}
                       onChange={e => setTitle(e.target.value)}
-                      placeholder={type === 'Recruitment' ? 'e.g. Robotics Club â€” Open Positions' : 'e.g. ROS Workshop 2026'}
+                      placeholder={type === 'Recruitment' ? 'e.g. Robotics Club — Open Positions' : 'e.g. ROS Workshop 2026'}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/25 transition-colors"
                     />
                   </div>
@@ -151,8 +151,8 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
                       onChange={e => setBody(e.target.value)}
                       rows={3}
                       placeholder={type === 'Recruitment'
-                        ? 'Describe the roles you are looking forâ€¦'
-                        : 'Describe the event, agenda, who should attendâ€¦'}
+                        ? 'Describe the roles you are looking for…'
+                        : 'Describe the event, agenda, who should attend…'}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/25 transition-colors resize-none"
                     />
                   </div>
@@ -263,13 +263,13 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
                             <img src={paymentQrImage} alt="QR preview" className="w-20 h-20 rounded-lg object-cover border border-white/10 bg-white" />
                             <div className="flex-1 text-xs">
                               {qrStatus === 'checking' && (
-                                <span className="text-gray-400 flex items-center gap-1.5"><Loader size={12} className="animate-spin" /> Checkingâ€¦</span>
+                                <span className="text-gray-400 flex items-center gap-1.5"><Loader size={12} className="animate-spin" /> Checking…</span>
                               )}
                               {qrStatus === 'valid' && (
                                 <span className="text-emerald-400 flex items-center gap-1.5"><CheckCircle size={12} /> Valid QR detected</span>
                               )}
                               {qrStatus === 'invalid' && (
-                                <span className="text-red-400 flex items-start gap-1.5"><AlertCircle size={12} className="mt-0.5" /> Could not read QR â€” please upload a valid QR code image</span>
+                                <span className="text-red-400 flex items-start gap-1.5"><AlertCircle size={12} className="mt-0.5" /> Could not read QR — please upload a valid QR code image</span>
                               )}
                             </div>
                           </div>
@@ -278,7 +278,7 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
 
                       <div>
                         <label className="text-xs text-gray-400 font-medium mb-1.5 flex items-center gap-1 block">
-                          <IndianRupee size={11} /> Amount (â‚¹) *
+                          <IndianRupee size={11} /> Amount (₹) *
                         </label>
                         <input
                           type="number"
@@ -301,7 +301,7 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
                       type="url"
                       value={image}
                       onChange={e => setImage(e.target.value)}
-                      placeholder="https://â€¦"
+                      placeholder="https://…"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/25 transition-colors"
                     />
                   </div>
@@ -337,7 +337,7 @@ const CreatePostModal = ({ isOpen, onClose, type, onCreated }) => {
                     disabled={loading}
                     className={`w-full py-3 bg-gradient-to-r ${gradientClass} text-white font-bold rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-2 mt-2`}
                   >
-                    {loading ? <><Loader size={16} className="animate-spin" /> Publishingâ€¦</> : `Publish ${type} Post`}
+                    {loading ? <><Loader size={16} className="animate-spin" /> Publishing…</> : `Publish ${type} Post`}
                   </button>
                 </div>
               </div>

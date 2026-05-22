@@ -66,7 +66,7 @@ const CommunityPublicProfile = ({ entityId, asModal = false, onClose }) => {
     return (
       <Wrapper className={`${wrapperClass} flex items-center justify-center py-20 gap-3 text-gray-500`}>
         <Loader size={20} className="animate-spin" />
-        <span>Loading communityâ€¦</span>
+        <span>Loading community…</span>
       </Wrapper>
     );
   }
@@ -130,7 +130,7 @@ const CommunityPublicProfile = ({ entityId, asModal = false, onClose }) => {
                   className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-60 flex items-center gap-2"
                 >
                   {joining
-                    ? <><Loader size={14} className="animate-spin" /> {data.isPrivate ? 'Requestingâ€¦' : 'Joiningâ€¦'}</>
+                    ? <><Loader size={14} className="animate-spin" /> {data.isPrivate ? 'Requesting…' : 'Joining…'}</>
                     : <><Plus size={14} /> {data.isPrivate ? 'Request to Join' : 'Join'}</>}
                 </button>
               )}
@@ -156,7 +156,7 @@ const CommunityPublicProfile = ({ entityId, asModal = false, onClose }) => {
                 <div key={p._id} className="bg-zinc-900 border border-white/10 rounded-2xl p-5">
                   <h3 className="text-sm font-bold text-white mb-1">{p.title}</h3>
                   <p className="text-xs text-gray-600 mb-2">
-                    by <span className="text-gray-400">{p.authorName}</span> Â· {new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    by <span className="text-gray-400">{p.authorName}</span> · {new Date(p.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                   </p>
                   {p.body && <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">{p.body}</p>}
                 </div>

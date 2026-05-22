@@ -118,7 +118,7 @@ const AdminAnnouncements = () => {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={5}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none transition-all resize-none"
-                placeholder="Enter the announcement detailsâ€¦"
+                placeholder="Enter the announcement details…"
               />
             </div>
 
@@ -218,7 +218,7 @@ const AdminAnnouncements = () => {
         {/* Recent Announcements Preview */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
           <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <span className="text-2xl">ðŸ“¢</span>
+            <span className="text-2xl">📢</span>
             Recent Announcements
           </h3>
           {recentAnnouncements.length === 0 ? (

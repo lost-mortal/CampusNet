@@ -82,7 +82,7 @@ const AnnouncementsChannel = () => {
                         <textarea
                             value={body}
                             onChange={e => setBody(e.target.value)}
-                            placeholder="Body â€” what does the community need to know?"
+                            placeholder="Body — what does the community need to know?"
                             rows={3}
                             className="w-full bg-zinc-800/60 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500/50 resize-none"
                         />
@@ -103,11 +103,11 @@ const AnnouncementsChannel = () => {
                 {/* List */}
                 {loading ? (
                     <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
-                        <Loader size={16} className="animate-spin" /> Loading announcementsâ€¦
+                        <Loader size={16} className="animate-spin" /> Loading announcements…
                     </div>
                 ) : announcements.length === 0 ? (
                     <div className="text-center py-16">
-                        <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">ðŸ“¢</div>
+                        <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">📢</div>
                         <h3 className="text-lg font-bold text-white mb-1">No announcements yet</h3>
                         <p className="text-gray-500 text-sm">
                             {isManager ? 'Post the first announcement above.' : 'The manager hasn\'t posted anything yet.'}
@@ -117,7 +117,7 @@ const AnnouncementsChannel = () => {
                     announcements.map(a => (
                         <div key={a._id} className="flex gap-4 group">
                             <div className="w-10 h-10 rounded-full bg-blue-600/20 flex-shrink-0 flex items-center justify-center text-lg">
-                                ðŸ‘©â€ðŸ’¼
+                                👩‍💼
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">

@@ -8,7 +8,7 @@ import ProfileModal from '../../components/ProfileModal';
 
 const API = import.meta.env.VITE_API_URL;
 
-const DEPT_AVATARS = { COMP: 'ðŸ‘¨â€ðŸ’»', ENTC: 'âš¡', IT: 'ðŸ–¥ï¸', MECH: 'âš™ï¸' };
+const DEPT_AVATARS = { COMP: '👨‍💻', ENTC: '⚡', IT: '🖥️', MECH: '⚙️' };
 
 const SUGGESTIONS = [
     'I want to learn robotics',
@@ -18,14 +18,14 @@ const SUGGESTIONS = [
 ];
 
 const LOADING_PHRASES = [
-    'Reading mindsâ€¦',
-    'Connecting the dotsâ€¦',
-    'Scanning the campusâ€¦',
-    'Consulting the oracleâ€¦',
-    'Reticulating splinesâ€¦',
-    'Asking aroundâ€¦',
-    'Following the breadcrumbsâ€¦',
-    'Sniffing out matchesâ€¦',
+    'Reading minds…',
+    'Connecting the dots…',
+    'Scanning the campus…',
+    'Consulting the oracle…',
+    'Reticulating splines…',
+    'Asking around…',
+    'Following the breadcrumbs…',
+    'Sniffing out matches…',
 ];
 const pickPhrase = () => LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)];
 
@@ -75,7 +75,7 @@ const Search = () => {
             setSentTo(prev => new Set([...prev, studentId]));
         } catch (err) {
             if (err.response?.status === 409) {
-                // Already sent â€” still show as sent
+                // Already sent — still show as sent
                 setSentTo(prev => new Set([...prev, studentId]));
             }
         } finally {
@@ -119,7 +119,7 @@ const Search = () => {
                         className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-40 flex items-center gap-2 shrink-0"
                     >
                         {loading
-                            ? <><Loader size={14} className="animate-spin" /> Searchingâ€¦</>
+                            ? <><Loader size={14} className="animate-spin" /> Searching…</>
                             : <><SearchIcon size={14} /> Search</>}
                     </button>
                 </form>
@@ -143,7 +143,7 @@ const Search = () => {
                     </div>
                 )}
 
-                {/* Idle state â€” no search yet */}
+                {/* Idle state — no search yet */}
                 {!loading && !results && !error && (
                     <div className="max-w-lg mx-auto text-center pt-12">
                         <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-indigo-500/20">
@@ -201,7 +201,7 @@ const Search = () => {
                                             >
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <div className="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center text-xl border border-indigo-500/20 shrink-0">
-                                                        ðŸ†
+                                                        🏆
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate">{club.name}</p>
@@ -237,7 +237,7 @@ const Search = () => {
                                             >
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center text-xl border border-purple-500/20 shrink-0">
-                                                        ðŸŒ
+                                                        🌐
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate">{comm.name}</p>
@@ -276,7 +276,7 @@ const Search = () => {
                                                     className="flex items-center gap-3 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
                                                 >
                                                     <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-lg border border-white/10 shrink-0">
-                                                        {DEPT_AVATARS[student.department] || 'ðŸ‘¤'}
+                                                        {DEPT_AVATARS[student.department] || '👤'}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate hover:text-indigo-300 transition-colors">{student.name}</p>
@@ -295,7 +295,7 @@ const Search = () => {
                                                         className="shrink-0 px-3 py-1.5 text-xs bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-600/30 transition-colors disabled:opacity-50 flex items-center gap-1.5"
                                                     >
                                                         {connecting === student.id
-                                                            ? <><Loader size={11} className="animate-spin" /> Sendingâ€¦</>
+                                                            ? <><Loader size={11} className="animate-spin" /> Sending…</>
                                                             : 'Connect'}
                                                     </button>
                                                 )}

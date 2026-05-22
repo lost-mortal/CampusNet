@@ -49,7 +49,7 @@ const EventStats = () => {
 
     const handleScan = async (ticketId) => {
         const scanId = Date.now();
-        setScanLog(prev => [{ id: scanId, status: 'pending', message: 'Checkingâ€¦' }, ...prev]);
+        setScanLog(prev => [{ id: scanId, status: 'pending', message: 'Checking…' }, ...prev]);
 
         try {
             const res = await axios.post(
@@ -64,8 +64,8 @@ const EventStats = () => {
                         ...e,
                         status: data.alreadyAttended ? 'warning' : 'success',
                         message: data.alreadyAttended
-                            ? `Already marked present â€” ${data.name}`
-                            : `${data.name} â€” ${data.rollNumber} marked present`,
+                            ? `Already marked present — ${data.name}`
+                            : `${data.name} — ${data.rollNumber} marked present`,
                     }
                     : e
             ));
@@ -186,7 +186,7 @@ const EventStats = () => {
         return (
             <div className="p-8 flex items-center justify-center gap-3 text-gray-500">
                 <Loader size={20} className="animate-spin" />
-                <span>Loading event dataâ€¦</span>
+                <span>Loading event data…</span>
             </div>
         );
     }
@@ -255,23 +255,23 @@ const EventStats = () => {
                     </div>
                     <p className="text-gray-400 text-sm flex items-center gap-2 flex-wrap">
                         <span>{clubName}</span>
-                        {eventDate && <span>Â· {new Date(eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>}
+                        {eventDate && <span>· {new Date(eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>}
                         {isPaid && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 text-[10px] font-bold border border-amber-500/30 uppercase tracking-wider">
-                                <IndianRupee size={10} />Paid Â· â‚¹{amount}
+                                <IndianRupee size={10} />Paid · ₹{amount}
                             </span>
                         )}
                     </p>
                 </div>
 
-                {/* Scanner â€” inlined (not a nested component) to avoid remount on state changes */}
+                {/* Scanner — inlined (not a nested component) to avoid remount on state changes */}
                 <div className="w-80 flex-shrink-0 bg-zinc-900 border border-white/10 rounded-2xl p-4">
                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <Camera size={12} className="text-blue-400" />
                         QR Scanner
                     </h3>
 
-                    {/* Camera view â€” always in DOM; Html5Qrcode requires a visible element to render the video feed */}
+                    {/* Camera view — always in DOM; Html5Qrcode requires a visible element to render the video feed */}
                     <div id="qr-reader" className="w-full rounded-xl overflow-hidden" />
 
                     {cameraState === 'idle' && (
@@ -295,7 +295,7 @@ const EventStats = () => {
                     {cameraState === 'denied' && (
                         <div className="bg-zinc-800 rounded-xl p-4 text-center mb-3 border border-white/5">
                             <CameraOff size={22} className="text-gray-600 mx-auto mb-2" />
-                            <p className="text-xs text-gray-500">Camera access denied â€” use manual entry</p>
+                            <p className="text-xs text-gray-500">Camera access denied — use manual entry</p>
                         </div>
                     )}
 
@@ -304,7 +304,7 @@ const EventStats = () => {
                         <input
                             value={manualInput}
                             onChange={e => setManualInput(e.target.value)}
-                            placeholder="Paste ticket IDâ€¦"
+                            placeholder="Paste ticket ID…"
                             className="flex-1 min-w-0 bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/40"
                         />
                         <button
@@ -312,11 +312,11 @@ const EventStats = () => {
                             disabled={submitting || !manualInput.trim()}
                             className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-500 transition-colors disabled:opacity-40 flex-shrink-0"
                         >
-                            {submitting ? 'â€¦' : 'Go'}
+                            {submitting ? '…' : 'Go'}
                         </button>
                     </form>
 
-                    {/* Scan log â€” newest first, in-memory only */}
+                    {/* Scan log — newest first, in-memory only */}
                     {scanLog.length > 0 && (
                         <div className="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar">
                             <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-wider">Scan Log</p>
@@ -376,19 +376,19 @@ const EventStats = () => {
                 </div>
             </div>
 
-            {/* Revenue card â€” paid events only */}
+            {/* Revenue card — paid events only */}
             {isPaid && (
                 <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-xl px-6 py-4 flex items-center gap-5">
                     <IndianRupee size={22} className="text-amber-400 shrink-0" />
                     <div>
                         <p className="text-[11px] font-semibold text-amber-400/70 uppercase tracking-wider mb-0.5">Total Collected</p>
-                        <p className="text-2xl font-bold text-amber-300">â‚¹{approvedCount * amount}</p>
+                        <p className="text-2xl font-bold text-amber-300">₹{approvedCount * amount}</p>
                     </div>
-                    <span className="text-xs text-gray-500 ml-1">{approvedCount} of {totalRegistered} payment{totalRegistered !== 1 ? 's' : ''} approved Â· â‚¹{amount} per head</span>
+                    <span className="text-xs text-gray-500 ml-1">{approvedCount} of {totalRegistered} payment{totalRegistered !== 1 ? 's' : ''} approved · ₹{amount} per head</span>
                 </div>
             )}
 
-            {/* Breakdowns â€” above the student list so they're always visible */}
+            {/* Breakdowns — above the student list so they're always visible */}
             {registrants.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {/* Department breakdown */}
@@ -484,9 +484,9 @@ const EventStats = () => {
                                 {registrants.map(r => (
                                     <tr key={r._id} className="hover:bg-white/[0.02] transition-colors">
                                         <td className="px-6 py-3 text-gray-200 font-medium">{r.name}</td>
-                                        <td className="px-6 py-3 text-gray-400 font-mono text-xs">{r.rollNumber || 'â€”'}</td>
-                                        <td className="px-6 py-3 text-gray-400">{r.department || 'â€”'}</td>
-                                        <td className="px-6 py-3 text-gray-400">{r.year || 'â€”'}</td>
+                                        <td className="px-6 py-3 text-gray-400 font-mono text-xs">{r.rollNumber || '—'}</td>
+                                        <td className="px-6 py-3 text-gray-400">{r.department || '—'}</td>
+                                        <td className="px-6 py-3 text-gray-400">{r.year || '—'}</td>
                                         <td className="px-6 py-3">
                                             {r.attended ? (
                                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium border border-emerald-500/20">
@@ -542,7 +542,7 @@ const EventStats = () => {
                                                     </div>
                                                 )}
                                                 {r.paymentStatus === 'free' && (
-                                                    <span className="text-xs text-gray-600">â€”</span>
+                                                    <span className="text-xs text-gray-600">—</span>
                                                 )}
                                             </td>
                                         )}
@@ -554,7 +554,7 @@ const EventStats = () => {
                 )}
             </div>
 
-            {/* Screenshot viewer modal â€” portaled below */}
+            {/* Screenshot viewer modal — portaled below */}
             {screenshotModalUrl && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"

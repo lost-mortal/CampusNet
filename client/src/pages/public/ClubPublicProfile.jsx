@@ -82,7 +82,7 @@ const ClubPublicProfile = ({ entityId, asModal = false }) => {
     return (
       <Wrapper className={`${wrapperClass} flex items-center justify-center py-20 gap-3 text-gray-500`}>
         <Loader size={20} className="animate-spin" />
-        <span>Loading club profileâ€¦</span>
+        <span>Loading club profile…</span>
       </Wrapper>
     );
   }
@@ -163,7 +163,7 @@ const ClubPublicProfile = ({ entityId, asModal = false }) => {
                   disabled={applyState === 'submitting'}
                   className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-60 flex items-center gap-2"
                 >
-                  {applyState === 'submitting' ? <><Loader size={14} className="animate-spin" /> Sendingâ€¦</> : 'Apply Now'}
+                  {applyState === 'submitting' ? <><Loader size={14} className="animate-spin" /> Sending…</> : 'Apply Now'}
                 </button>
               )}
             </div>
@@ -222,7 +222,7 @@ const ClubPublicProfile = ({ entityId, asModal = false }) => {
                             disabled={state === 'submitting'}
                             className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-60 flex items-center gap-1.5"
                           >
-                            {state === 'submitting' ? <><Loader size={11} className="animate-spin" /> â€¦</> : 'Register'}
+                            {state === 'submitting' ? <><Loader size={11} className="animate-spin" /> …</> : 'Register'}
                           </button>
                         )}
                       </div>

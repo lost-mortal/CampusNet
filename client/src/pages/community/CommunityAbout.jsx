@@ -18,7 +18,7 @@ const CommunityAbout = () => {
     const [form, setForm] = useState({
         name: community.name,
         description: community.description || '',
-        icon: community.icon || 'ðŸŒ',
+        icon: community.icon || '🌐',
         tags: community.tags || [],
         profilePhoto: community.profilePhoto || '',
         bannerImage: community.bannerImage || '',
@@ -31,7 +31,7 @@ const CommunityAbout = () => {
         setForm({
             name: community.name,
             description: community.description || '',
-            icon: community.icon || 'ðŸŒ',
+            icon: community.icon || '🌐',
             tags: [...(community.tags || [])],
             profilePhoto: community.profilePhoto || '',
             bannerImage: community.bannerImage || '',
@@ -63,7 +63,7 @@ const CommunityAbout = () => {
             await axios.patch(`${API}/api/communities/${community._id}`, {
                 name: form.name.trim(),
                 description: form.description.trim(),
-                icon: form.icon.trim() || 'ðŸŒ',
+                icon: form.icon.trim() || '🌐',
                 tags: form.tags,
                 profilePhoto: form.profilePhoto,
                 bannerImage: form.bannerImage,
@@ -161,7 +161,7 @@ const CommunityAbout = () => {
                         <div className="flex items-center gap-2 text-gray-500 text-xs uppercase tracking-wider mb-2">
                             <Crown size={12} className="text-purple-400" /> Manager
                         </div>
-                        <p className="text-sm font-bold text-white truncate">{community.manager?.name || 'â€”'}</p>
+                        <p className="text-sm font-bold text-white truncate">{community.manager?.name || '—'}</p>
                         {community.manager?.rollNumber && (
                             <p className="text-xs text-gray-500 mt-0.5">{community.manager.rollNumber}</p>
                         )}
@@ -176,7 +176,7 @@ const CommunityAbout = () => {
                                 <div key={p._id} className="bg-zinc-900 border border-white/10 rounded-2xl p-5">
                                     <h3 className="text-sm font-bold text-white mb-1">{p.title}</h3>
                                     <p className="text-xs text-gray-600 mb-2">
-                                        by <span className="text-gray-400">{p.authorName}</span> Â· {formatDate(p.createdAt)}
+                                        by <span className="text-gray-400">{p.authorName}</span> · {formatDate(p.createdAt)}
                                     </p>
                                     {p.body && <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 whitespace-pre-wrap">{p.body}</p>}
                                 </div>
@@ -278,7 +278,7 @@ const CommunityAbout = () => {
                                 disabled={saving || !form.name.trim()}
                                 className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:opacity-90 disabled:opacity-40 transition flex items-center justify-center gap-2"
                             >
-                                {saving ? <><Loader size={14} className="animate-spin" /> Savingâ€¦</> : 'Save Changes'}
+                                {saving ? <><Loader size={14} className="animate-spin" /> Saving…</> : 'Save Changes'}
                             </button>
                         </div>
                     </form>

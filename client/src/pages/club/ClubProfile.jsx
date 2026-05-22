@@ -50,7 +50,7 @@ const ClubProfile = () => {
     useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
     const openEdit = () => {
-        setEditEmoji(profile?.logoEmoji || 'ðŸ†');
+        setEditEmoji(profile?.logoEmoji || '🏆');
         setEditDesc(profile?.description || '');
         setEditTags(profile?.tags || []);
         setEditProfilePhoto(profile?.profilePhoto || '');
@@ -87,7 +87,7 @@ const ClubProfile = () => {
     if (!clubId || loading) {
         return (
             <div className="flex items-center justify-center h-full gap-2 text-gray-500">
-                <Loader size={18} className="animate-spin" /> Loadingâ€¦
+                <Loader size={18} className="animate-spin" /> Loading…
             </div>
         );
     }
@@ -127,7 +127,7 @@ const ClubProfile = () => {
                             <h1 className="text-3xl font-bold text-white mb-2">{profile.name}</h1>
                             <div className="flex flex-wrap items-center gap-2 mb-4">
                                 <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-sm font-medium border border-emerald-500/20">
-                                    âœ“ Verified Club
+                                    ✓ Verified Club
                                 </span>
                                 <span className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-sm font-medium border border-violet-500/20">
                                     {isPresident ? 'President' : 'Member'}
@@ -157,7 +157,7 @@ const ClubProfile = () => {
                             <div className="flex items-center gap-2 text-gray-400 text-sm">
                                 <span>President:</span>
                                 <span className="text-white font-medium">{profile.president.name}</span>
-                                <span className="text-gray-600">Â·</span>
+                                <span className="text-gray-600">·</span>
                                 <span className="font-mono text-xs text-gray-500">{profile.president.rollNumber}</span>
                             </div>
                         )}
@@ -214,7 +214,7 @@ const ClubProfile = () => {
                                 <input
                                     value={editEmoji}
                                     onChange={e => setEditEmoji(e.target.value)}
-                                    placeholder="ðŸ†"
+                                    placeholder="🏆"
                                     className="w-24 bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-2xl text-center focus:outline-none focus:border-violet-500/50"
                                 />
                             </div>

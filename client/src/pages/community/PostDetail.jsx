@@ -99,7 +99,7 @@ const PostDetail = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full gap-2 text-gray-500">
-                <Loader size={18} className="animate-spin" /> Loading threadâ€¦
+                <Loader size={18} className="animate-spin" /> Loading thread…
             </div>
         );
     }
@@ -112,7 +112,7 @@ const PostDetail = () => {
                         onClick={() => navigate(`/community/${community._id}/forum/discussions`)}
                         className="mt-4 text-blue-400 hover:text-blue-300"
                     >
-                        â† Back to Discussions
+                        ← Back to Discussions
                     </button>
                 </div>
             </div>
@@ -155,7 +155,7 @@ const PostDetail = () => {
                                     <span className="text-xl">{thread.authorAvatar}</span>
                                     <span className="font-medium text-gray-300">{thread.authorName}</span>
                                 </div>
-                                <span>â€¢</span>
+                                <span>•</span>
                                 <span>{timeAgo(thread.createdAt)}</span>
                             </div>
                             <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line">{thread.body}</p>
@@ -199,7 +199,7 @@ const PostDetail = () => {
                                 value={commentBody}
                                 onChange={e => setCommentBody(e.target.value)}
                                 rows={3}
-                                placeholder="Write a commentâ€¦"
+                                placeholder="Write a comment…"
                                 onKeyDown={e => {
                                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleComment();
                                 }}

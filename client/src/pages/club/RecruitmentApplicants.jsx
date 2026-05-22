@@ -68,7 +68,7 @@ const RecruitmentApplicants = () => {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 gap-3">
         <Loader size={20} className="animate-spin" />
-        <span>Loading applicantsâ€¦</span>
+        <span>Loading applicants…</span>
       </div>
     );
   }

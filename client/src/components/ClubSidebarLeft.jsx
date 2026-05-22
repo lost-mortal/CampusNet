@@ -114,10 +114,10 @@ const ClubSidebarLeft = () => {
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-violet-600/20 flex items-center justify-center text-2xl border border-violet-500/30 group-hover:border-violet-500/50 transition-colors">
-            {club?.logo || 'ðŸ†'}
+            {club?.logo || '🏆'}
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-white text-sm truncate">{club?.name || 'â€¦'}</h2>
+            <h2 className="font-bold text-white text-sm truncate">{club?.name || '…'}</h2>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span className="text-xs text-emerald-400 font-medium tracking-wide uppercase">
@@ -137,7 +137,7 @@ const ClubSidebarLeft = () => {
               className="flex items-center gap-1 text-xs font-semibold text-gray-500 uppercase tracking-widest hover:text-gray-300 transition-colors"
             >
               <span>Channels</span>
-              <span className={`transform transition-transform duration-200 ml-1 ${channelsOpen ? 'rotate-180' : ''}`}>â–¼</span>
+              <span className={`transform transition-transform duration-200 ml-1 ${channelsOpen ? 'rotate-180' : ''}`}>▼</span>
             </button>
             {club?.isPresident && (
               <button
@@ -205,7 +205,7 @@ const ClubSidebarLeft = () => {
             className="flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-widest cursor-pointer hover:text-gray-300 transition-colors"
           >
             <span>Live Operations</span>
-            <span className={`transform transition-transform duration-200 ${liveOpsOpen ? 'rotate-180' : ''}`}>â–¼</span>
+            <span className={`transform transition-transform duration-200 ${liveOpsOpen ? 'rotate-180' : ''}`}>▼</span>
           </div>
 
           {liveOpsOpen && (
@@ -256,7 +256,7 @@ const ClubSidebarLeft = () => {
                             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                           >
                             <XCircle size={12} />
-                            {closingId === activeRecruitment._id ? 'Closingâ€¦' : 'Close Applications'}
+                            {closingId === activeRecruitment._id ? 'Closing…' : 'Close Applications'}
                           </button>
                           <button
                             onClick={() => setDeleteTarget({

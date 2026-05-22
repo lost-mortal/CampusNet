@@ -72,7 +72,7 @@ const CommunityCollabs = () => {
             }, { headers: { Authorization: `Bearer ${token}` } });
             setConnectedIds(prev => new Set([...prev, collabId]));
         } catch (err) {
-            // 409 = already connected/requested â€” treat as success
+            // 409 = already connected/requested — treat as success
             if (err.response?.status === 409) {
                 setConnectedIds(prev => new Set([...prev, collabId]));
             } else {
@@ -202,11 +202,11 @@ const CommunityCollabs = () => {
                     {/* List */}
                     {loading ? (
                         <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
-                            <Loader size={16} className="animate-spin" /> Loading collabsâ€¦
+                            <Loader size={16} className="animate-spin" /> Loading collabs…
                         </div>
                     ) : collabs.length === 0 && !showForm ? (
                         <div className="text-center py-16">
-                            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">ðŸ¤</div>
+                            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">🤝</div>
                             <h3 className="text-xl font-bold text-white mb-2">No collaboration requests yet</h3>
                             <p className="text-gray-500 mb-6">Be the first to post a collaboration opportunity!</p>
                             {isMember && (
@@ -273,10 +273,10 @@ const CommunityCollabs = () => {
                                             <span className="text-base">{collab.authorAvatar}</span>
                                             <span className="text-gray-400">{collab.authorName}</span>
                                         </div>
-                                        <span>â€¢</span>
+                                        <span>•</span>
                                         <span>{timeAgo(collab.createdAt)}</span>
                                     </div>
-                                    {/* Connect button â€” hidden for own posts */}
+                                    {/* Connect button — hidden for own posts */}
                                     {collab.authorId && collab.authorId.toString() !== currentUserId && (
                                         connectedIds.has(collab._id) ? (
                                             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">

@@ -190,7 +190,7 @@ const CreateCommunityModal = ({ isOpen, onClose, onSubmitted }) => {
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         rows={3}
-                        placeholder="For admin review only â€” not shown publicly."
+                        placeholder="For admin review only — not shown publicly."
                         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 resize-none"
                       />
                       <p className="text-[10px] text-gray-600 mt-1">This message is visible to the admin only.</p>
@@ -217,7 +217,7 @@ const CreateCommunityModal = ({ isOpen, onClose, onSubmitted }) => {
                       className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-bold transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                     >
                       {loading
-                        ? <><Loader size={14} className="animate-spin" /> Submittingâ€¦</>
+                        ? <><Loader size={14} className="animate-spin" /> Submitting…</>
                         : 'Submit Request'}
                     </button>
                   </div>

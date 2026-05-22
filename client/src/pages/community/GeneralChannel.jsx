@@ -93,7 +93,7 @@ const GeneralChannel = () => {
             <div ref={scrollerRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
                 {loading ? (
                     <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
-                        <Loader size={16} className="animate-spin" /> Loading messagesâ€¦
+                        <Loader size={16} className="animate-spin" /> Loading messages…
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="text-center py-16">
@@ -107,7 +107,7 @@ const GeneralChannel = () => {
                         return (
                             <div key={m._id} className="flex gap-3 group">
                                 <div className="w-9 h-9 rounded-full bg-zinc-700 flex-shrink-0 flex items-center justify-center text-base">
-                                    {m.sender?.avatar || 'ðŸ‘¤'}
+                                    {m.sender?.avatar || '👤'}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-0.5">

@@ -107,7 +107,7 @@ const StudentRightSidebar = () => {
                 ) : mine.pending ? (
                     <div className="w-full py-2.5 px-3 flex items-center justify-center gap-2 bg-white/[0.03] border border-dashed border-white/10 rounded-lg text-gray-500 text-sm cursor-not-allowed">
                         <Hourglass size={14} />
-                        <span>Request Pendingâ€¦</span>
+                        <span>Request Pending…</span>
                     </div>
                 ) : (
                     <button
@@ -126,7 +126,7 @@ const StudentRightSidebar = () => {
                 {loading ? (
                     <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
                         <Loader size={14} className="animate-spin" />
-                        <span>Loadingâ€¦</span>
+                        <span>Loading…</span>
                     </div>
                 ) : myList.length === 0 ? (
                     <p className="text-xs text-gray-600">You haven't joined any communities yet</p>
@@ -159,7 +159,7 @@ const StudentRightSidebar = () => {
                 {loading ? (
                     <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
                         <Loader size={14} className="animate-spin" />
-                        <span>Loadingâ€¦</span>
+                        <span>Loading…</span>
                     </div>
                 ) : suggestions.length === 0 ? (
                     <p className="text-xs text-gray-600">No suggestions right now</p>

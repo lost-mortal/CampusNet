@@ -124,7 +124,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
             <div className="flex items-start justify-between gap-3 pt-2 border-t border-white/5">
                 <span className="text-gray-500 shrink-0">Ticket</span>
                 {item.isPaid ? (
-                    <span className="text-amber-400 font-bold">PAID EVENT â€” â‚¹{item.amount}</span>
+                    <span className="text-amber-400 font-bold">PAID EVENT — ₹{item.amount}</span>
                 ) : (
                     <span className="text-emerald-400 font-medium">Free</span>
                 )}
@@ -204,12 +204,12 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                 );
             }
 
-            // Initial event view â€” expanded for both free + paid
+            // Initial event view — expanded for both free + paid
             return (
                 <div>
                     <div className="flex items-start gap-4 mb-5">
                         <div className="w-14 h-14 rounded-xl bg-indigo-500/20 flex items-center justify-center text-2xl shrink-0 border border-indigo-500/30">
-                            {item.clubLogo || 'ðŸ†'}
+                            {item.clubLogo || '🏆'}
                         </div>
                         <div className="min-w-0">
                             <h3 className="text-xl font-bold text-white mb-1">{item.title}</h3>
@@ -229,7 +229,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                     {item.isPaid && (
                         <div className="bg-amber-500/5 border border-amber-500/30 rounded-xl p-4 mb-5">
                             <div className="flex items-center justify-center gap-2 mb-3 text-amber-300 text-sm font-bold tracking-wide">
-                                <IndianRupee size={15} /> PAID EVENT â€” â‚¹{item.amount}
+                                <IndianRupee size={15} /> PAID EVENT — ₹{item.amount}
                             </div>
 
                             {item.paymentQrImage ? (
@@ -281,7 +281,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                         className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-colors shadow-[0_0_20px_rgba(79,70,229,0.3)] mb-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading
-                            ? <><Loader size={16} className="animate-spin" /> {item.isPaid ? 'Submittingâ€¦' : 'Registeringâ€¦'}</>
+                            ? <><Loader size={16} className="animate-spin" /> {item.isPaid ? 'Submitting…' : 'Registering…'}</>
                             : (item.isPaid ? 'Register & Submit Payment' : 'Confirm Registration')}
                     </button>
                     <p className="text-center text-xs text-gray-500">
@@ -354,7 +354,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                         disabled={loading}
                         className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)] disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                        {loading ? <><Loader size={16} className="animate-spin" /> Submittingâ€¦</> : 'Submit Profile'}
+                        {loading ? <><Loader size={16} className="animate-spin" /> Submitting…</> : 'Submit Profile'}
                     </button>
                 </div>
             );
@@ -402,7 +402,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                         </div>
                         <div className="min-w-0">
                             <h3 className="text-lg font-bold text-white mb-0.5 truncate">{item.title}</h3>
-                            <p className="text-gray-400 text-sm truncate">by {item.authorName}{item.communityName ? ` Â· ${item.communityName}` : ''}</p>
+                            <p className="text-gray-400 text-sm truncate">by {item.authorName}{item.communityName ? ` · ${item.communityName}` : ''}</p>
                         </div>
                     </div>
 
@@ -430,7 +430,7 @@ const ActionModal = ({ isOpen, onClose, item }) => {
                         disabled={loading}
                         className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-500 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.3)] disabled:opacity-60"
                     >
-                        {loading ? 'Sendingâ€¦' : 'Send Connection Request'}
+                        {loading ? 'Sending…' : 'Send Connection Request'}
                     </button>
                 </div>
             );

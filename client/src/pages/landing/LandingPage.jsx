@@ -233,7 +233,7 @@ const LandingPage = () => {
                                                 <Terminal size={20} className="text-indigo-400" />
                                             </div>
                                             <h2 className="text-2xl font-bold mb-2">Sign In</h2>
-                                            <p className="text-gray-500 text-sm">Sinhgad Engineering â€” CampusNet</p>
+                                            <p className="text-gray-500 text-sm">Sinhgad Engineering — CampusNet</p>
                                         </div>
 
                                         <form onSubmit={handleLogin} className="space-y-4">
@@ -266,7 +266,7 @@ const LandingPage = () => {
                                             {error && <p className="text-red-400 text-xs text-center">{error}</p>}
                                             <button type="submit" disabled={loading}
                                                 className="w-full py-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-xl font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50">
-                                                {loading ? 'Signing inâ€¦' : 'Sign In'}
+                                                {loading ? 'Signing in…' : 'Sign In'}
                                             </button>
                                         </form>
 
@@ -281,7 +281,7 @@ const LandingPage = () => {
                                                 <Lock size={20} className="text-yellow-400" />
                                             </div>
                                             <h2 className="text-2xl font-bold mb-2">Set New Password</h2>
-                                            <p className="text-gray-500 text-sm">First login â€” please create a new password</p>
+                                            <p className="text-gray-500 text-sm">First login — please create a new password</p>
                                         </div>
 
                                         <form onSubmit={handleChangePassword} className="space-y-4">
@@ -304,7 +304,7 @@ const LandingPage = () => {
                                             {error && <p className="text-red-400 text-xs text-center">{error}</p>}
                                             <button type="submit" disabled={loading}
                                                 className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50">
-                                                {loading ? 'Savingâ€¦' : 'Set Password & Continue'}
+                                                {loading ? 'Saving…' : 'Set Password & Continue'}
                                             </button>
                                         </form>
                                     </>

@@ -69,7 +69,7 @@ const StudentPublicProfile = ({ entityId, asModal = false, onClose }) => {
     return (
       <Wrapper className={`${wrapperClass} flex items-center justify-center py-20 gap-3 text-gray-500`}>
         <Loader size={20} className="animate-spin" />
-        <span>Loading profileâ€¦</span>
+        <span>Loading profile…</span>
       </Wrapper>
     );
   }
@@ -121,7 +121,7 @@ const StudentPublicProfile = ({ entityId, asModal = false, onClose }) => {
         className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-60 flex items-center gap-2"
       >
         {connecting
-          ? <><Loader size={14} className="animate-spin" /> Sendingâ€¦</>
+          ? <><Loader size={14} className="animate-spin" /> Sending…</>
           : <><UserPlus size={14} /> Connect</>}
       </button>
     );

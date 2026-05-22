@@ -33,7 +33,7 @@ const CommunityMemberList = ({ members, pendingRequests = [], isManager, communi
             if (data?.error === 'ALREADY_COMMUNITY_MANAGER') {
                 setPromoteError({
                     title: 'Already a Community Manager',
-                    message: `${targetName} is already the manager of ${data.otherCommunityName}. A student can manage at most one community â€” ask them to step down first.`,
+                    message: `${targetName} is already the manager of ${data.otherCommunityName}. A student can manage at most one community — ask them to step down first.`,
                 });
             } else {
                 setPromoteError({
@@ -182,7 +182,7 @@ const CommunityMemberList = ({ members, pendingRequests = [], isManager, communi
             )}
             <div className="p-4 border-b border-white/10">
                 <h3 className="text-sm font-semibold text-white uppercase tracking-wide">
-                    Members â€” {members.length}
+                    Members — {members.length}
                 </h3>
             </div>
 
@@ -190,7 +190,7 @@ const CommunityMemberList = ({ members, pendingRequests = [], isManager, communi
                 {isManager && pendingRequests.length > 0 && (
                     <div className="mb-2">
                         <div className="px-2 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-amber-300/80">
-                            Pending requests â€” {pendingRequests.length}
+                            Pending requests — {pendingRequests.length}
                         </div>
                         {pendingRequests.map(r => (
                             <div

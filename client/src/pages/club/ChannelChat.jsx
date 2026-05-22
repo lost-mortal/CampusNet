@@ -18,7 +18,7 @@ function formatTime(iso) {
     return new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
-// â”€â”€â”€ Announcements Channel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Announcements Channel ───────────────────────────────────────────────────
 const AnnouncementsChannel = ({ isPresident }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ const AnnouncementsChannel = ({ isPresident }) => {
 
             <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                 <div className="max-w-3xl mx-auto space-y-4">
-                    {/* Compose â€” president only */}
+                    {/* Compose — president only */}
                     {isPresident && (
                         <form onSubmit={handlePost} className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 mb-6">
                             <p className="text-xs font-semibold text-amber-400/80 uppercase tracking-widest mb-3">Post Announcement</p>
@@ -84,7 +84,7 @@ const AnnouncementsChannel = ({ isPresident }) => {
                                 value={body}
                                 onChange={e => setBody(e.target.value)}
                                 rows={3}
-                                placeholder="Write an announcement for your clubâ€¦"
+                                placeholder="Write an announcement for your club…"
                                 onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handlePost(e); }}
                                 className="w-full bg-zinc-800/60 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-amber-500/40 resize-none mb-3"
                             />
@@ -105,11 +105,11 @@ const AnnouncementsChannel = ({ isPresident }) => {
 
                     {loading ? (
                         <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
-                            <Loader size={16} className="animate-spin" /> Loadingâ€¦
+                            <Loader size={16} className="animate-spin" /> Loading…
                         </div>
                     ) : items.length === 0 ? (
                         <div className="text-center py-16">
-                            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">ðŸ“¢</div>
+                            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">📢</div>
                             <h3 className="text-lg font-bold text-white mb-2">No announcements yet</h3>
                             <p className="text-gray-500 text-sm">
                                 {isPresident ? 'Use the form above to post the first announcement.' : 'The president hasn\'t posted anything yet.'}
@@ -122,7 +122,7 @@ const AnnouncementsChannel = ({ isPresident }) => {
                                 <div className="flex items-center gap-2 text-xs text-gray-500 border-t border-white/5 pt-3">
                                     <span className="text-base">{item.authorAvatar}</span>
                                     <span className="font-medium text-amber-400/80">{item.authorName}</span>
-                                    <span>Â·</span>
+                                    <span>·</span>
                                     <span>{timeAgo(item.createdAt)}</span>
                                 </div>
                             </div>
@@ -134,7 +134,7 @@ const AnnouncementsChannel = ({ isPresident }) => {
     );
 };
 
-// â”€â”€â”€ General / Custom Chat Channel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── General / Custom Chat Channel ──────────────────────────────────────────
 const ChatChannel = ({ channelId }) => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -203,7 +203,7 @@ const ChatChannel = ({ channelId }) => {
             <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                 {loading ? (
                     <div className="flex items-center justify-center h-full gap-2 text-gray-500">
-                        <Loader size={16} className="animate-spin" /> Loadingâ€¦
+                        <Loader size={16} className="animate-spin" /> Loading…
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center">
@@ -270,13 +270,13 @@ const ChatChannel = ({ channelId }) => {
                         {sending ? <Loader size={16} className="animate-spin" /> : <Send size={16} />}
                     </button>
                 </div>
-                <p className="text-[10px] text-gray-700 mt-1 ml-1">Enter to send Â· Shift+Enter for new line</p>
+                <p className="text-[10px] text-gray-700 mt-1 ml-1">Enter to send · Shift+Enter for new line</p>
             </div>
         </div>
     );
 };
 
-// â”€â”€â”€ Root component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Root component ──────────────────────────────────────────────────────────
 const ChannelChat = () => {
     const { channelId } = useParams();
     const { isPresident } = useOutletContext() || {};

@@ -8,9 +8,9 @@ Do not delete history. Append. The full build history lives here so any new chat
 
 ## Current position
 
-**Day:** 3
-**Last phase passed:** 3.3 + bulk import (Admin layer fully wired: ManageClubs CRUD, ManageCommunities two-tab with delete, AdminAnnouncements POST/GET, student Announcements page wired to real API; CSV/Excel bulk student import with full pre-flight validation; announcements targeting bug fixed)
-**Next phase to start:** 3.4 (AI Insights — Live Ops + Admin dashboard summaries)
+**Day:** 3 (build complete)
+**Last phase passed:** 3.5 — entire app is built (phases 1.1 through 3.5 all done); deployment hardening complete (commit 11e3999 pushed to main); Vercel + Render auto-deployed; deployed `/api/health` returns ok+dbConnected; CORS preflight from Vercel origin returns 204
+**Next step:** Manual smoke test of both deployed Vercel URL and localhost — confirm parity (deployment changes didn't break local flow)
 **Blocked on:** nothing
 
 ---
@@ -38,8 +38,8 @@ Mark each phase: ⏳ pending · 🔨 in progress · ✅ passed gate · ❌ block
 - ✅ 3.2 Community channels — announcements + general (polled) + collab + kick
 - ✅ 3.2-ext Club channels — announcements (president-post) + general/custom chat (polled) + club profile (real data + edit) + member list (real API + navigate)
 - ✅ 3.3 Admin layer wiring — manage clubs / communities / announcements
-- ⏳ 3.4 AI Insights — Live Ops + Admin dashboard summaries
-- ⏳ 3.5 Buffer / polish / smoke test
+- ✅ 3.4 AI Insights — Live Ops + Admin dashboard summaries
+- ✅ 3.5 Polish + production deployment (commit 11e3999 → Vercel + Render live)
 
 ---
 
@@ -98,9 +98,15 @@ Mark each phase: ⏳ pending · 🔨 in progress · ✅ passed gate · ❌ block
 - 2026-05-17: Paid event flow — CreatePostModal got Free/Paid toggle, html5-qrcode.scanFile() client-side QR validation (non-blocking hint), amount input. ActionModal widens to max-w-2xl for paid events; shows event detail block + QR + screenshot upload; Register button disabled until screenshot picked; new `pending_verification` success state. Activity hub `/api/activity/me` filters out pending_verification regs so broken tickets don't appear.
 - 2026-05-17: Live Ops payment column in EventStats — `View Screenshot` modal, `Approve Payment` (PATCH /api/registrations/:id/approve-payment, any club member, generates ticketId on approval), `Reject Payment` (DELETE /api/registrations/:id/reject-payment with confirm prompt, deletes the reg so student can resubmit). Attendance left to QR scanner — no manual Mark Attendance button.
 
+- 2026-05-22: Deployment hardening — removed every `http://localhost:5000` fallback across 35 client files; introduced `client/src/lib/config.js` with hard-throw if `VITE_API_URL` is missing (imported once in `main.jsx` for side-effect); new `VITE_SOCKET_URL` env var defaults to `VITE_API_URL` if unset. Backend now requires `ALLOWED_ORIGINS` env (comma-separated allowlist incl. `*.vercel.app` wildcard); server refuses to boot if missing. Deleted unauthenticated `/api/dev/students` route (Phase 1.3 leftover that dumped the entire student directory). Added `.claude/` to `.gitignore`. Render URL: `https://campusnet-axvh.onrender.com`, Vercel URL: `https://campus-net-9r6r7.vercel.app`. Verified post-deploy: deployed health endpoint returns `{status:'ok',dbConnected:true}`, CORS preflight from Vercel origin returns 204 with correct allow-origin echo, localhost dev unaffected.
+- 2026-05-22: Secret rotation required — during `.env` repair, raw values of `MONGODB_URI`/`JWT_SECRET`/`GEMINI_API_KEY` were echoed into the chat log. User rotated all three and updated both local `.env` and Render env vars. New values never appeared in any chat output.
+- 2026-05-22: UTF-8 mojibake regression introduced + fixed. The bulk PowerShell find/replace that stripped `localhost:5000` fallbacks (32 files) silently double-encoded every non-ASCII char in those files because PowerShell 5.1's default text codec is Windows-1252, not UTF-8. Result: 30 client source files had `·` corrupted to `Â·`, `…` to `â€¦`, emoji like `📢` to `ðŸ"¢`, dropdown arrows to mojibake — visible on both deployed Vercel AND localhost after the push. Fix: wrote `scripts/fix-mojibake.js` — a one-shot reverse round-trip (UTF-8 chars → CP1252 byte mapping incl. C1 special chars + undefined-slot passthrough → re-decode as UTF-8). Verified zero data loss + zero residual mojibake across all 30 files; production build clean; bundle now contains proper Unicode (`·`, `…`, `📢`, `🏆`, `🌐`).
+- 2026-05-22: Rule going forward — NEVER use PowerShell 5.1 for bulk text replacement across multiple files. If absolutely necessary, force encoding with `Get-Content -Encoding UTF8` AND `[System.IO.File]::WriteAllText($path, $content, [System.Text.UTF8Encoding]::new($false))` (NOT `Set-Content -Encoding UTF8` which writes a BOM). Default preference: Node script, sed via Git Bash, or the Edit tool one file at a time.
+
 ## Bugs fixed in this session
 - 2026-05-17: BUG 1 React Router transition crash — ChannelChat's `navigate('/club/chat/general')` in useEffect fired twice under React 19 StrictMode (mount → cleanup → remount), throwing "Cannot transition to a new state, already under transition" which surfaced at /club/recruitment/:id via the ClubLayout-level ErrorBoundary. Fixed by wrapping the navigate in setTimeout(fn, 0) with a clearTimeout cleanup so StrictMode's simulated unmount cancels the pending nav.
 - 2026-05-17: BUG 2 Already registered button — feed event card now grey-disables "Already Registered" pill instead of "Register Now" when GET /api/posts.alreadyRegistered is true.
+- 2026-05-22: BUG 3 — UTF-8 → CP1252 → UTF-8 double-encoding mojibake in 30 client source files (`Â·` / `â€¦` / `ðŸ"¢` etc.) caused by PowerShell 5.1's CP1252-default `Set-Content`. User spotted it on the deployed Vercel link (member list `·`, announcements `📢`, dropdown arrows). Reverse round-trip script (`scripts/fix-mojibake.js`) restored all chars cleanly; production build verified.
 
 (Append new decisions here as you build. One line each.)
 

@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, X, Loader, Users, ChevronDown } from 'lucide-react
 import axios from 'axios';
 import { getToken } from '../../lib/session';
 
-// Searchable student picker â€” replaces native <select> for scalability
+// Searchable student picker — replaces native <select> for scalability
 const StudentPicker = ({ students, value, onChange }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -56,7 +56,7 @@ const StudentPicker = ({ students, value, onChange }) => {
           <>
             <span className="flex-1 text-white text-sm">
               {selected.firstName} {selected.lastName}
-              <span className="text-gray-500 ml-2 text-xs">({selected.year} Â· {selected.department})</span>
+              <span className="text-gray-500 ml-2 text-xs">({selected.year} · {selected.department})</span>
             </span>
             <button type="button" onClick={handleClear} className="text-gray-600 hover:text-gray-300 transition-colors">
               <X size={14} />
@@ -69,7 +69,7 @@ const StudentPicker = ({ students, value, onChange }) => {
               value={query}
               onChange={e => { setQuery(e.target.value); setOpen(true); }}
               onFocus={() => setOpen(true)}
-              placeholder={selected ? `${selected.firstName} ${selected.lastName}` : 'Search by name, dept, yearâ€¦'}
+              placeholder={selected ? `${selected.firstName} ${selected.lastName}` : 'Search by name, dept, year…'}
               className="flex-1 bg-transparent outline-none text-white text-sm placeholder-gray-500"
             />
             <ChevronDown size={14} className="text-gray-500 flex-shrink-0" />
@@ -93,7 +93,7 @@ const StudentPicker = ({ students, value, onChange }) => {
                 }`}
               >
                 <span>{s.firstName} {s.lastName}</span>
-                <span className="text-xs text-gray-500">{s.year} Â· {s.department}</span>
+                <span className="text-xs text-gray-500">{s.year} · {s.department}</span>
               </li>
             ))
           )}
@@ -105,7 +105,7 @@ const StudentPicker = ({ students, value, onChange }) => {
 
 const API = import.meta.env.VITE_API_URL;
 
-const DEPT_AVATARS = { COMP: 'ðŸ‘¨â€ðŸ’»', ENTC: 'âš¡', IT: 'ðŸ–¥ï¸', MECH: 'âš™ï¸' };
+const DEPT_AVATARS = { COMP: '👨‍💻', ENTC: '⚡', IT: '🖥️', MECH: '⚙️' };
 
 const ManageClubs = () => {
   const [clubs, setClubs] = useState([]);
@@ -135,7 +135,7 @@ const ManageClubs = () => {
   const allowedPresidentId = editingClub?.president?._id ? String(editingClub.president._id) : null;
 
   // Create flow: only students not in any club (existing behavior).
-  // Edit flow: only this club's own members + its current president â€” so the
+  // Edit flow: only this club's own members + its current president — so the
   // admin reassigns the presidency from within the club.
   const eligibleStudents = editingClub
     ? (() => {
@@ -172,7 +172,7 @@ const ManageClubs = () => {
       });
     } else {
       setEditingClub(null);
-      setFormData({ name: '', logoEmoji: 'ðŸ†', description: '', presidentId: '' });
+      setFormData({ name: '', logoEmoji: '🏆', description: '', presidentId: '' });
     }
     setIsFormOpen(true);
   };
@@ -248,7 +248,7 @@ const ManageClubs = () => {
       {loading ? (
         <div className="flex items-center gap-3 text-gray-500 py-20 justify-center">
           <Loader size={20} className="animate-spin" />
-          <span>Loading clubsâ€¦</span>
+          <span>Loading clubs…</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -286,12 +286,12 @@ const ManageClubs = () => {
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-gray-400 mb-3 line-clamp-2">{club.description || 'â€”'}</p>
+              <p className="text-sm text-gray-400 mb-3 line-clamp-2">{club.description || '—'}</p>
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-2xl">{DEPT_AVATARS[club.president?.department] || 'ðŸ‘¤'}</span>
+                <span className="text-2xl">{DEPT_AVATARS[club.president?.department] || '👤'}</span>
                 <div>
                   <p className="text-xs text-gray-500">President</p>
-                  <p className="text-purple-400 font-semibold text-sm">{club.president?.name || 'â€”'}</p>
+                  <p className="text-purple-400 font-semibold text-sm">{club.president?.name || '—'}</p>
                 </div>
               </div>
             </div>
@@ -331,7 +331,7 @@ const ManageClubs = () => {
                     value={formData.logoEmoji}
                     onChange={(e) => setFormData({ ...formData, logoEmoji: e.target.value })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none transition-all"
-                    placeholder="e.g., ðŸ¤–"
+                    placeholder="e.g., 🤖"
                   />
                 </div>
 
@@ -344,8 +344,8 @@ const ManageClubs = () => {
                   />
                   <p className="text-xs text-gray-500 mt-2">
                     {editingClub
-                      ? 'Pick a new president from this clubâ€™s existing members.'
-                      : 'Only students who arenâ€™t already in a club are shown.'}
+                      ? 'Pick a new president from this club’s existing members.'
+                      : 'Only students who aren’t already in a club are shown.'}
                   </p>
                 </div>
 
@@ -356,7 +356,7 @@ const ManageClubs = () => {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-purple-500/50 focus:outline-none transition-all resize-none"
-                    placeholder="Describe what the club doesâ€¦"
+                    placeholder="Describe what the club does…"
                   />
                 </div>
 

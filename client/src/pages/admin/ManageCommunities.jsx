@@ -5,7 +5,7 @@ import { getToken } from '../../lib/session';
 
 const API = import.meta.env.VITE_API_URL;
 
-const DEPT_AVATARS = { COMP: 'ðŸ‘¨â€ðŸ’»', ENTC: 'âš¡', IT: 'ðŸ–¥ï¸', MECH: 'âš™ï¸' };
+const DEPT_AVATARS = { COMP: '👨‍💻', ENTC: '⚡', IT: '🖥️', MECH: '⚙️' };
 
 const ManageCommunities = () => {
   const [tab, setTab] = useState('pending');
@@ -134,7 +134,7 @@ const ManageCommunities = () => {
       {loading ? (
         <div className="flex items-center gap-3 text-gray-500 py-20 justify-center">
           <Loader size={20} className="animate-spin" />
-          <span>Loadingâ€¦</span>
+          <span>Loading…</span>
         </div>
       ) : tab === 'pending' ? (
         pendingRequests.length === 0 ? (
@@ -181,16 +181,16 @@ const ManageCommunities = () => {
 
                 <div className="mb-4 p-3 bg-white/5 border border-white/5 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wider">Why it should be approved</p>
-                  <p className="text-sm text-gray-300">{request.reason || request.description || 'â€”'}</p>
+                  <p className="text-sm text-gray-300">{request.reason || request.description || '—'}</p>
                 </div>
 
                 {request.requestedBy && (
                   <div className="flex items-center gap-3 mb-6 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
-                    <div className="text-2xl">{DEPT_AVATARS[request.requestedBy.department] || 'ðŸ‘¤'}</div>
+                    <div className="text-2xl">{DEPT_AVATARS[request.requestedBy.department] || '👤'}</div>
                     <div>
                       <p className="text-xs text-gray-500">Requested by</p>
                       <p className="text-sm font-semibold text-indigo-400">{request.requestedBy.name}</p>
-                      <p className="text-xs text-gray-500">{request.requestedBy.year} Â· {request.requestedBy.department} Â· {request.requestedBy.rollNumber}</p>
+                      <p className="text-xs text-gray-500">{request.requestedBy.year} · {request.requestedBy.department} · {request.requestedBy.rollNumber}</p>
                     </div>
                   </div>
                 )}
@@ -271,7 +271,7 @@ const ManageCommunities = () => {
 
                 {community.manager && (
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-xl">{DEPT_AVATARS[community.manager.department] || 'ðŸ‘¤'}</span>
+                    <span className="text-xl">{DEPT_AVATARS[community.manager.department] || '👤'}</span>
                     <div>
                       <p className="text-xs text-gray-500">Manager</p>
                       <p className="text-purple-400 font-semibold text-sm">{community.manager.name}</p>

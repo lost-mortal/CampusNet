@@ -41,19 +41,19 @@ const StudentProfile = () => {
     const [newSkill, setNewSkill] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
 
-    // Activity tab â€” aggregated data
+    // Activity tab — aggregated data
     const [activity, setActivity] = useState(null);
     const [activityLoading, setActivityLoading] = useState(false);
     const [activityFetched, setActivityFetched] = useState(false);
     const [ticketModal, setTicketModal] = useState(null); // ticket object for QR modal
-    const [expandedCollabs, setExpandedCollabs] = useState({}); // collabId â†’ boolean
+    const [expandedCollabs, setExpandedCollabs] = useState({}); // collabId → boolean
 
-    // My Collab Posts (Activity â†’ 5th section)
+    // My Collab Posts (Activity → 5th section)
     const [myCollabs, setMyCollabs] = useState([]);
     const [myCollabsLoading, setMyCollabsLoading] = useState(false);
     const [deleteCollabId, setDeleteCollabId] = useState(null);
 
-    // Collapsible state for activity sections â€” local only, default all expanded
+    // Collapsible state for activity sections — local only, default all expanded
     const [openSections, setOpenSections] = useState({
         tickets: true,
         applications: true,
@@ -148,7 +148,7 @@ const StudentProfile = () => {
             // Sync session + local state so the cover/avatar update immediately.
             setSessionUser(data.user);
             setUser(data.user);
-            // Skills/social remain client-local â€” not yet wired to the API.
+            // Skills/social remain client-local — not yet wired to the API.
             setSkills(editForm.skills);
             setSocial({ github: editForm.github, linkedin: editForm.linkedin });
             setShowEditModal(false);
@@ -188,8 +188,8 @@ const StudentProfile = () => {
         );
     }
 
-    const department = user.department || 'â€”';
-    const year = user.year || 'â€”';
+    const department = user.department || '—';
+    const year = user.year || '—';
 
     return (
         <main className="flex-1 min-w-0 bg-black min-h-screen pb-20 border-r border-white/5">
@@ -217,8 +217,8 @@ const StudentProfile = () => {
                         <div className="flex-1 pt-16">
                             <h1 className="text-3xl font-bold text-white mb-1">{user.name}</h1>
                             <p className="text-gray-400 text-sm mb-2">
-                                {year} Â· {department}
-                                {user.role === 'president' ? ' Â· Club President' : user.role === 'member' ? ' Â· Club Member' : ''}
+                                {year} · {department}
+                                {user.role === 'president' ? ' · Club President' : user.role === 'member' ? ' · Club Member' : ''}
                             </p>
                             {user.clubName && (
                                 <div className="flex items-center gap-2 text-indigo-400 text-sm">
@@ -259,7 +259,7 @@ const StudentProfile = () => {
             {/* Tab content */}
             <div className="w-full px-6 mt-8">
 
-                {/* â”€â”€ About â”€â”€ */}
+                {/* ── About ── */}
                 {activeTab === 'about' && (
                     <div className="space-y-6">
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -276,7 +276,7 @@ const StudentProfile = () => {
                                     <Hash size={18} className="text-gray-500" />
                                     <div>
                                         <p className="text-xs text-gray-500">Roll Number</p>
-                                        <p className="text-sm text-white">{user.rollNumber || 'â€”'}</p>
+                                        <p className="text-sm text-white">{user.rollNumber || '—'}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
@@ -346,19 +346,19 @@ const StudentProfile = () => {
                     </div>
                 )}
 
-                {/* â”€â”€ Activity â”€â”€ */}
+                {/* ── Activity ── */}
                 {activeTab === 'activity' && (
                     <div className="space-y-10 pb-8">
                         {activityLoading && (
                             <div className="flex items-center gap-3 text-gray-500 py-16 justify-center">
                                 <Loader size={20} className="animate-spin" />
-                                <span>Loading your activityâ€¦</span>
+                                <span>Loading your activity…</span>
                             </div>
                         )}
 
                         {!activityLoading && activity && (
                             <>
-                                {/* â”€â”€ Event Tickets â”€â”€ */}
+                                {/* ── Event Tickets ── */}
                                 <section>
                                     <button
                                         type="button"
@@ -429,7 +429,7 @@ const StudentProfile = () => {
                                     ))}
                                 </section>
 
-                                {/* â”€â”€ Recruitment Applications â”€â”€ */}
+                                {/* ── Recruitment Applications ── */}
                                 <section>
                                     <button
                                         type="button"
@@ -478,7 +478,7 @@ const StudentProfile = () => {
                                     ))}
                                 </section>
 
-                                {/* â”€â”€ Collab Connections â”€â”€ */}
+                                {/* ── Collab Connections ── */}
                                 <section>
                                     <button
                                         type="button"
@@ -500,7 +500,7 @@ const StudentProfile = () => {
                                         </div>
                                     ) : (
                                         <div className="space-y-4">
-                                            {/* Received â€” someone connected to my post */}
+                                            {/* Received — someone connected to my post */}
                                             {activity.collabConnections.received.length > 0 && (
                                                 <div>
                                                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -554,7 +554,7 @@ const StudentProfile = () => {
                                                 </div>
                                             )}
 
-                                            {/* Sent â€” I connected to someone's post */}
+                                            {/* Sent — I connected to someone's post */}
                                             {activity.collabConnections.sent.length > 0 && (
                                                 <div>
                                                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -595,7 +595,7 @@ const StudentProfile = () => {
                                     ))}
                                 </section>
 
-                                {/* â”€â”€ General Connections â”€â”€ */}
+                                {/* ── General Connections ── */}
                                 <section>
                                     <button
                                         type="button"
@@ -693,7 +693,7 @@ const StudentProfile = () => {
                                     ))}
                                 </section>
 
-                                {/* â”€â”€ My Collab Posts â”€â”€ */}
+                                {/* ── My Collab Posts ── */}
                                 <section>
                                     <button
                                         type="button"
@@ -710,7 +710,7 @@ const StudentProfile = () => {
                                     </button>
                                     {openSections.myCollabs && (myCollabsLoading ? (
                                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-center gap-3 text-gray-500 text-sm">
-                                            <Loader size={16} className="animate-spin" /> Loadingâ€¦
+                                            <Loader size={16} className="animate-spin" /> Loading…
                                         </div>
                                     ) : myCollabs.length === 0 ? (
                                         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
@@ -732,7 +732,7 @@ const StudentProfile = () => {
                                                         </button>
                                                     </div>
                                                     <p className="text-gray-500 text-xs">
-                                                        {c.communityName || 'General'} Â· {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                        {c.communityName || 'General'} · {new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                     </p>
                                                     <p className="text-pink-300 text-xs mt-1.5">
                                                         {c.connectionCount || 0} connection{c.connectionCount === 1 ? '' : 's'} generated
@@ -794,14 +794,14 @@ const StudentProfile = () => {
                     </div>
                 )}
 
-                {/* â”€â”€ Chat â”€â”€ */}
+                {/* ── Chat ── */}
                 {activeTab === 'chat' && (
                     <div className="pb-8">
                         <ChatTab currentUserId={user._id} />
                     </div>
                 )}
 
-                {/* â”€â”€ Portfolio â”€â”€ */}
+                {/* ── Portfolio ── */}
                 {activeTab === 'portfolio' && (
                     <div className="pb-8">
                         <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
@@ -859,7 +859,7 @@ const StudentProfile = () => {
                                         onChange={e => setNewSkill(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addSkill())}
                                         className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500/50"
-                                        placeholder="Add a skillâ€¦"
+                                        placeholder="Add a skill…"
                                     />
                                     <button onClick={addSkill} className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 rounded-xl text-indigo-300 transition-all">
                                         <Plus size={20} />
@@ -916,7 +916,7 @@ const StudentProfile = () => {
                                 className="flex-1 py-2 rounded-xl bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white font-medium transition-all hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
                             >
                                 {savingProfile && <Loader size={14} className="animate-spin" />}
-                                {savingProfile ? 'Savingâ€¦' : 'Save Changes'}
+                                {savingProfile ? 'Saving…' : 'Save Changes'}
                             </button>
                         </div>
                     </div>

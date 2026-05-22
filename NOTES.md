@@ -57,7 +57,8 @@ A running log. End of each day, append what was built, decided, broken, and defe
 ## Day 3 — Polish + AI insights (date: ___)
 
 ### Built
--
+- 2026-05-22: Production deployment — bundled ALL remaining feature work (phases 1.5 through 3.5, including AI Insights for Live Ops + Admin dashboard) + deployment hardening into commit 11e3999; pushed to main → Vercel + Render auto-deployed. Removed 35 localhost fallbacks; central `client/src/lib/config.js` with hard-fail on missing env; backend requires `ALLOWED_ORIGINS`; deleted unauthenticated `/api/dev/students` leak. Deployed health endpoint + CORS preflight verified server-side; localhost dev path retested and unaffected. App is feature-complete; remaining work is manual smoke-testing both environments for parity.
+- 2026-05-22: Hotfix — UTF-8 mojibake regression caused by PowerShell 5.1's CP1252-default text encoding during the bulk localhost-fallback strip. 30 client source files were silently double-encoded; emoji + middle dots + ellipses + dropdown arrows rendered as `Â·` / `â€¦` / `ðŸ"¢` on both deployed and localhost. Fixed via reverse round-trip script (`scripts/fix-mojibake.js`); production build re-verified.
 
 ### Decisions
 -

@@ -56,7 +56,7 @@ const CommunityLayout = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen bg-black text-gray-500 gap-2">
-                <Loader size={18} className="animate-spin" /> Loading communityâ€¦
+                <Loader size={18} className="animate-spin" /> Loading community…
             </div>
         );
     }

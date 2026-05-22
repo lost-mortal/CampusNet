@@ -153,7 +153,7 @@ const DiscussionBoard = () => {
                             type="text"
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            placeholder="Thread titleâ€¦"
+                            placeholder="Thread title…"
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
                         />
                         <textarea
@@ -188,7 +188,7 @@ const DiscussionBoard = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-3">
                 {loading ? (
                     <div className="flex items-center justify-center py-10 gap-2 text-gray-500">
-                        <Loader size={16} className="animate-spin" /> Loading discussionsâ€¦
+                        <Loader size={16} className="animate-spin" /> Loading discussions…
                     </div>
                 ) : sorted.length === 0 ? (
                     <div className="text-center py-16">
@@ -229,9 +229,9 @@ const DiscussionBoard = () => {
                                             <span className="text-base">{post.authorAvatar}</span>
                                             <span>{post.authorName}</span>
                                         </div>
-                                        <span>â€¢</span>
+                                        <span>•</span>
                                         <span>{timeAgo(post.createdAt)}</span>
-                                        <span>â€¢</span>
+                                        <span>•</span>
                                         <div className="flex items-center gap-1.5 text-gray-400 group-hover:text-blue-400 transition-colors">
                                             <MessageSquare size={13} />
                                             <span className="font-medium">{post.commentCount} comments</span>

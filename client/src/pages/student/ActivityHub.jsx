@@ -36,7 +36,7 @@ const ActivityHub = () => {
                 {loading && (
                     <div className="flex items-center justify-center py-20 text-gray-500 gap-3">
                         <Loader size={20} className="animate-spin" />
-                        <span>Loading your ticketsâ€¦</span>
+                        <span>Loading your tickets…</span>
                     </div>
                 )}
 

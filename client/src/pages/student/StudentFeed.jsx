@@ -155,7 +155,7 @@ const GeneralCollabModal = ({ onClose, onPosted }) => {
 
           <button type="submit" disabled={submitting}
             className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 text-sm">
-            {submitting ? 'Postingâ€¦' : 'Post Collab Request'}
+            {submitting ? 'Posting…' : 'Post Collab Request'}
           </button>
         </form>
       </motion.div>
@@ -286,7 +286,7 @@ const StudentFeed = () => {
           ))}
         </div>
 
-        {/* Sub-filter row â€” only for Events / Recruitment */}
+        {/* Sub-filter row — only for Events / Recruitment */}
         {SUB_FILTERED_TABS.has(activeFilter) && (
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 px-6 mb-4">
             {SUB_FILTERS.map(s => (
@@ -325,7 +325,7 @@ const StudentFeed = () => {
         {loading && (
           <div className="flex items-center justify-center py-20 text-gray-500 gap-3">
             <Loader size={20} className="animate-spin" />
-            <span>Loading feedâ€¦</span>
+            <span>Loading feed…</span>
           </div>
         )}
 
@@ -343,7 +343,7 @@ const StudentFeed = () => {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-gray-200">{item.communityName}</h3>
-                      <p className="text-xs text-gray-500">{item.authorName} â€¢ {timeAgo(item.createdAt)}</p>
+                      <p className="text-xs text-gray-500">{item.authorName} • {timeAgo(item.createdAt)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -404,7 +404,7 @@ const StudentFeed = () => {
                 <div className={`h-32 w-full bg-gradient-to-br ${TAG_GRADIENTS[item.tag] || TAG_GRADIENTS.Other} relative flex items-end p-4`}>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
                   <div className="relative z-10 flex items-center gap-2">
-                    <span className="text-2xl">{item.clubLogo || 'ðŸ†'}</span>
+                    <span className="text-2xl">{item.clubLogo || '🏆'}</span>
                     <span className="text-xs font-bold text-white/60 uppercase tracking-wider">{item.clubName}</span>
                   </div>
                   <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10">
@@ -419,7 +419,7 @@ const StudentFeed = () => {
                     </h3>
                     {item.isPaid && (
                       <span className="px-2 py-1 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold border border-amber-500/30 whitespace-nowrap">
-                        â‚¹{item.amount} Â· PAID
+                        ₹{item.amount} · PAID
                       </span>
                     )}
                   </div>

@@ -72,7 +72,7 @@ const ClubMemberList = ({ isPresident = false, clubName = '', onChanged }) => {
                 />
             )}
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">
-                Club Members â€” {members.length}
+                Club Members — {members.length}
             </h3>
 
             <div className="space-y-3">
@@ -100,7 +100,7 @@ const ClubMemberList = ({ isPresident = false, clubName = '', onChanged }) => {
                                         {member.name}
                                     </p>
                                     <p className={`text-xs truncate ${ROLE_COLOR[member.role] || 'text-gray-500'}`}>
-                                        {member.role} Â· {member.year} {member.dept}
+                                        {member.role} · {member.year} {member.dept}
                                     </p>
                                 </div>
                             </button>
