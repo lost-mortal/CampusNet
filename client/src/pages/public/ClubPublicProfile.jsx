@@ -105,7 +105,7 @@ const ClubPublicProfile = ({ entityId, asModal = false }) => {
             ? <img src={data.bannerImage} alt="Banner" className="absolute inset-0 w-full h-full object-cover" />
             : <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-purple-900/40 to-zinc-900" />}
         </div>
-        <div className="px-8 -mt-16 pb-6">
+        <div className="relative z-10 px-8 -mt-16 pb-6">
           <div className="flex items-start gap-6">
             <div className="w-28 h-28 rounded-2xl bg-zinc-900 border-4 border-black flex items-center justify-center text-6xl shadow-2xl flex-shrink-0 overflow-hidden">
               {data.profilePhoto
