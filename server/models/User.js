@@ -8,8 +8,9 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   role: { type: String, enum: ['admin', 'student'], default: 'student' },
   department: { type: String, enum: ['COMP', 'ENTC', 'IT', 'MECH'] },
-  year: { type: String, enum: ['FE', 'SE', 'TE', 'BE'] },
+  year: { type: String, enum: ['FE', 'SE', 'TE', 'BE', 'Alumni'] },
   joinYear: { type: Number },
+  phone: { type: String, default: '' },
   mustChangePassword: { type: Boolean, default: true },
   motherName: { type: String, default: '' },
   birthDate: { type: String, default: '' }, // DDMMYY

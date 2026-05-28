@@ -6,7 +6,8 @@ import ClubPublicProfile from '../pages/public/ClubPublicProfile';
 import CommunityPublicProfile from '../pages/public/CommunityPublicProfile';
 
 // Unified profile popup. type: 'student' | 'club' | 'community', id: entity id.
-const ProfileModal = ({ type, id, onClose }) => {
+// viewOnly hides the Connect/Message actions (used by admin to view a student).
+const ProfileModal = ({ type, id, onClose, viewOnly = false }) => {
     useEffect(() => {
         const onKey = (e) => { if (e.key === 'Escape') onClose(); };
         document.addEventListener('keydown', onKey);
@@ -16,7 +17,7 @@ const ProfileModal = ({ type, id, onClose }) => {
     if (!type || !id) return null;
 
     const content = () => {
-        if (type === 'student') return <StudentPublicProfile entityId={id} asModal onClose={onClose} />;
+        if (type === 'student') return <StudentPublicProfile entityId={id} asModal onClose={onClose} hideActions={viewOnly} />;
         if (type === 'club')    return <ClubPublicProfile entityId={id} asModal />;
         if (type === 'community') return <CommunityPublicProfile entityId={id} asModal onClose={onClose} />;
         return null;

@@ -8,7 +8,7 @@ These are settled. Do not relitigate during build sessions; come back to the pla
 
 ### Identity
 - Two account types: admin (single account), student (bulk-imported)
-- Student email format: `firstname.rollnumber@college.edu` (e.g., `parth.fe2023comp042@sinhgad.edu`)
+- Student email format: `firstname.<5-letter-code><joiningYY>@sinhgad.edu` (e.g., `arjun.xnpyz25@sinhgad.edu`) — code randomly generated, keyed off joining year so it survives year rollover (updated 2026-05-28; was `firstname.rollnumber`)
 - `rollNumber` is the unique identifier in DB; email is secondary
 - JWT-based auth; first-login forces password change
 - Multi-state roles: a student can simultaneously be a Fresher / Club Member / Club President / Community Manager / Community Member, subject to constraints below

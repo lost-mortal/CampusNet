@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   BarChart3, Users, CheckSquare, Megaphone, ShieldCheck, Settings,
-  Briefcase, Edit3, X, Loader,
+  Briefcase, Edit3, X, Loader, GraduationCap,
 } from 'lucide-react';
 import api from '../lib/api';
 
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/admin/clubs', label: 'Manage Clubs', icon: Briefcase },
   { path: '/admin/communities', label: 'Manage Communities', icon: CheckSquare },
   { path: '/admin/announcements', label: 'Post Announcement', icon: Megaphone },
+  { path: '/admin/alumni', label: 'Alumni', icon: GraduationCap },
 ];
 
 const initialsOf = (name = '') =>

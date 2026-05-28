@@ -6,6 +6,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
 const mongoose = require('mongoose');
 const bcrypt   = require('bcryptjs');
 const crypto   = require('crypto');
+const { deterministicEmail, fakePhone } = require('./utils/studentIdentity');
 
 const User         = require('./models/User');
 const Club         = require('./models/Club');
@@ -85,6 +86,8 @@ async function seedExtra() {
   );
   const toInsert = extraDefs.filter((_, i) => !existingRolls.has(allRolls[i]));
 
+  const existingEmails = await User.find({}).select('email').lean();
+  const emailTaken = new Set(existingEmails.map(u => (u.email || '').toLowerCase()));
   const newStudents = toInsert.length
     ? await User.insertMany(
         await Promise.all(toInsert.map(async (d) => {
@@ -92,7 +95,7 @@ async function seedExtra() {
           const passwordHash = await bcrypt.hash(`${d.motherName.toLowerCase()}@${d.birthDate}`, 10);
           return {
             rollNumber,
-            email: `${d.firstName.toLowerCase()}.${rollNumber}@sinhgad.edu`,
+            email: deterministicEmail(d.firstName, d.jy, rollNumber, emailTaken),
             passwordHash,
             firstName: d.firstName,
             lastName: d.lastName,
@@ -100,6 +103,7 @@ async function seedExtra() {
             department: d.dept,
             year: d.year,
             joinYear: d.jy,
+            phone: fakePhone(rollNumber),
             mustChangePassword: true,
             motherName: d.motherName,
             birthDate: d.birthDate,

@@ -6,6 +6,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const { deterministicEmail, fakePhone } = require('./utils/studentIdentity');
 
 const User         = require('./models/User');
 const Club         = require('./models/Club');
@@ -125,6 +126,7 @@ async function seed() {
       skills: ['CFD', 'ANSYS', 'Chess', 'Manufacturing', 'Composites'] },
   ];
 
+  const emailTaken = new Set(['admin@sinhgad.edu']);
   const students = await User.insertMany(
     await Promise.all(studentDefs.map(async ({ firstName, lastName, dept, year, jy, num, motherName, birthDate, bio, skills }) => {
       const rollNumber = `${year.toLowerCase()}${jy}${dept.toLowerCase()}${num}`;
@@ -132,7 +134,7 @@ async function seed() {
       const passwordHash = await bcrypt.hash(password, 10);
       return {
         rollNumber,
-        email: `${firstName.toLowerCase()}.${rollNumber}@sinhgad.edu`,
+        email: deterministicEmail(firstName, jy, rollNumber, emailTaken),
         passwordHash,
         firstName,
         lastName,
@@ -140,6 +142,7 @@ async function seed() {
         department: dept,
         year,
         joinYear: jy,
+        phone: fakePhone(rollNumber),
         mustChangePassword: true,
         motherName,
         birthDate,

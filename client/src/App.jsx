@@ -30,6 +30,7 @@ import ManageClubs from './pages/admin/ManageClubs';
 import ManageCommunities from './pages/admin/ManageCommunities';
 import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import ManageUsers from './pages/admin/ManageUsers';
+import AlumniDirectory from './pages/admin/AlumniDirectory';
 import AdminSettings from './pages/admin/AdminSettings';
 
 import { getToken, getUser } from './lib/session';
@@ -97,6 +98,7 @@ function App() {
             <Route path="communities" element={<ManageCommunities />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
             <Route path="users" element={<ManageUsers />} />
+            <Route path="alumni" element={<AlumniDirectory />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Route>

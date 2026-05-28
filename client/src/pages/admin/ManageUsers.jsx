@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UploadCloud, Search, RefreshCw, Loader, FileText, X, CheckCircle, AlertCircle, Ban, Trash2, ShieldCheck } from 'lucide-react';
+import { UploadCloud, Search, RefreshCw, Loader, FileText, X, CheckCircle, AlertCircle, Ban, Trash2, ShieldCheck, GraduationCap, Mail, Sparkles } from 'lucide-react';
 import api from '../../lib/api';
+import ProfileModal from '../../components/ProfileModal';
 
 const DEPT_COLORS = {
   COMP: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
@@ -21,13 +22,21 @@ const ManageUsers = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deptFilter, setDeptFilter] = useState('ALL');
+  const [yearFilter, setYearFilter] = useState('ALL');
+  const [profileId, setProfileId] = useState(null); // student profile popup
 
   // Upload state
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null); // { type: 'success'|'error', ... }
+  const [importMode, setImportMode] = useState('generated'); // 'provided' | 'generated'
   const fileInputRef = useRef(null);
+
+  // Academic-year rollover
+  const [rolloverOpen, setRolloverOpen] = useState(false);
+  const [rollingOver, setRollingOver] = useState(false);
 
   // Row-level action modals
   const [resetTarget, setResetTarget] = useState(null);       // confirm reset password
@@ -125,14 +134,34 @@ const ManageUsers = () => {
 
   useEffect(() => { fetchStudents(); }, []);
 
+  // Rollover preview counts (students excludes alumni already).
+  const graduateCount = students.filter(s => s.year === 'BE').length;
+  const advanceCount = students.filter(s => ['FE', 'SE', 'TE'].includes(s.year)).length;
+
+  const confirmRollover = async () => {
+    setRollingOver(true);
+    try {
+      const { data } = await api.post('/api/admin/advance-year');
+      flash('success', `${data.promoted} student${data.promoted !== 1 ? 's' : ''} advanced, ${data.graduated} graduated to Alumni.`);
+      setRolloverOpen(false);
+      fetchStudents();
+    } catch (err) {
+      flash('error', err.response?.data?.error || 'Failed to advance academic year');
+    } finally {
+      setRollingOver(false);
+    }
+  };
+
   const filtered = students.filter(s => {
     const q = searchTerm.toLowerCase();
     const fullName = `${s.firstName} ${s.lastName}`.toLowerCase();
-    return (
+    const matchesSearch =
       fullName.includes(q) ||
       s.rollNumber?.toLowerCase().includes(q) ||
-      s.email?.toLowerCase().includes(q)
-    );
+      s.email?.toLowerCase().includes(q);
+    const matchesDept = deptFilter === 'ALL' || s.department === deptFilter;
+    const matchesYear = yearFilter === 'ALL' || s.year === yearFilter;
+    return matchesSearch && matchesDept && matchesYear;
   });
 
   const handleFileSelect = (file) => {
@@ -177,7 +206,7 @@ const ManageUsers = () => {
         reader.readAsDataURL(selectedFile);
       });
 
-      const res = await api.post('/api/admin/import-students', { fileData });
+      const res = await api.post('/api/admin/import-students', { fileData, mode: importMode });
       setImportResult({ type: 'success', count: res.data.imported });
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -197,11 +226,20 @@ const ManageUsers = () => {
 
   return (
     <div className="min-h-screen p-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-          User Management
-        </h1>
-        <p className="text-gray-500">Manage student accounts and bulk imports</p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+            User Management
+          </h1>
+          <p className="text-gray-500">Manage student accounts and bulk imports</p>
+        </div>
+        <button
+          onClick={() => setRolloverOpen(true)}
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500/15 to-purple-500/15 hover:from-indigo-500/25 hover:to-purple-500/25 border border-indigo-500/40 text-indigo-300 rounded-xl text-sm font-bold transition-all shrink-0"
+        >
+          <GraduationCap size={16} />
+          Advance Academic Year
+        </button>
       </div>
 
       {/* ── Bulk Import ── */}
@@ -258,12 +296,54 @@ const ManageUsers = () => {
               </div>
               <div className="mt-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-gray-500 text-left leading-relaxed">
                 <span className="text-gray-400 font-semibold block mb-1">Required columns (in any order):</span>
-                <span className="font-mono text-indigo-300">firstName · lastName · rollNumber · department · year · motherName · birthDate</span>
+                <span className="font-mono text-indigo-300">
+                  firstName · lastName · rollNumber · department · year · motherName · birthDate · phone{importMode === 'provided' ? ' · email' : ''}
+                </span>
                 <br />
-                <span className="text-gray-600">department: COMP / ENTC / IT / MECH &nbsp;|&nbsp; year: FE / SE / TE / BE &nbsp;|&nbsp; birthDate: DDMMYY (e.g. 150807)</span>
+                <span className="text-gray-600">department: COMP / ENTC / IT / MECH &nbsp;|&nbsp; year: FE / SE / TE / BE &nbsp;|&nbsp; birthDate: DDMMYY (e.g. 150807) &nbsp;|&nbsp; phone: 10-digit mobile</span>
               </div>
             </div>
           )}
+        </div>
+
+        {/* Import mode — how emails are sourced */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setImportMode('provided')}
+            className={`text-left p-4 rounded-xl border transition-all ${
+              importMode === 'provided'
+                ? 'bg-indigo-500/15 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <Mail size={16} className={importMode === 'provided' ? 'text-indigo-300' : 'text-gray-400'} />
+              <span className={`text-sm font-bold ${importMode === 'provided' ? 'text-white' : 'text-gray-300'}`}>College provides emails</span>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              CSV includes an <span className="font-mono text-indigo-300">email</span> column. Must be a valid
+              @sinhgad.edu address; stored exactly as given.
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setImportMode('generated')}
+            className={`text-left p-4 rounded-xl border transition-all ${
+              importMode === 'generated'
+                ? 'bg-purple-500/15 border-purple-500/50 shadow-[0_0_15px_rgba(147,51,234,0.2)]'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles size={16} className={importMode === 'generated' ? 'text-purple-300' : 'text-gray-400'} />
+              <span className={`text-sm font-bold ${importMode === 'generated' ? 'text-white' : 'text-gray-300'}`}>Generate emails</span>
+            </div>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              No email column. We build a unique <span className="font-mono text-purple-300">firstname.code&lt;YY&gt;@sinhgad.edu</span> per
+              student, keyed to the joining year.
+            </p>
+          </button>
         </div>
 
         {/* Import button — only shown when a file is selected */}
@@ -323,15 +403,39 @@ const ManageUsers = () => {
               {loading ? '…' : filtered.length}
             </span>
           </h3>
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-            <input
-              type="text"
-              placeholder="Search by name, roll no or email..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 transition-all text-white placeholder-gray-600"
-            />
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <select
+              value={deptFilter}
+              onChange={e => setDeptFilter(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+            >
+              <option value="ALL">All Departments</option>
+              <option value="COMP">COMP</option>
+              <option value="ENTC">ENTC</option>
+              <option value="IT">IT</option>
+              <option value="MECH">MECH</option>
+            </select>
+            <select
+              value={yearFilter}
+              onChange={e => setYearFilter(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
+            >
+              <option value="ALL">All Years</option>
+              <option value="FE">FE</option>
+              <option value="SE">SE</option>
+              <option value="TE">TE</option>
+              <option value="BE">BE</option>
+            </select>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+              <input
+                type="text"
+                placeholder="Search by name, roll no or email..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 transition-all text-white placeholder-gray-600"
+              />
+            </div>
           </div>
         </div>
 
@@ -350,6 +454,7 @@ const ManageUsers = () => {
                   <th className="p-4 font-medium">Email</th>
                   <th className="p-4 font-medium">Department</th>
                   <th className="p-4 font-medium">Year</th>
+                  <th className="p-4 font-medium">Phone</th>
                   <th className="p-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
@@ -362,7 +467,12 @@ const ManageUsers = () => {
                           {DEPT_AVATARS[student.department] || '👤'}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-white">{student.firstName} {student.lastName}</span>
+                          <button
+                            onClick={() => setProfileId(student._id)}
+                            className="font-medium text-white hover:text-indigo-300 transition-colors"
+                          >
+                            {student.firstName} {student.lastName}
+                          </button>
                           {student.isRestricted && (
                             <span
                               className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30"
@@ -382,6 +492,7 @@ const ManageUsers = () => {
                       </span>
                     </td>
                     <td className="p-4 text-gray-400">{student.year}</td>
+                    <td className="p-4 text-gray-400 text-sm font-mono">{student.phone || '—'}</td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
@@ -521,6 +632,45 @@ const ManageUsers = () => {
           onConfirm={() => confirmDelete(deleteTarget.student)}
           busy={actionBusyId === deleteTarget.student._id}
         />
+      )}
+
+      {/* Advance Academic Year confirm */}
+      {rolloverOpen && (
+        <ActionModal
+          icon={<GraduationCap size={18} className="text-indigo-300" />}
+          accent="orange"
+          title="Advance Academic Year?"
+          body={
+            <>
+              <p className="text-sm text-gray-300 leading-relaxed mb-3">
+                The academic year has ended. This will promote <span className="text-white font-semibold">every student</span> up one year:
+              </p>
+              <div className="text-sm bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 mb-3 space-y-1">
+                <p className="text-gray-300">FE → SE → TE → BE → <span className="text-indigo-300 font-semibold">Alumni</span></p>
+              </div>
+              <ul className="text-sm space-y-1.5 mb-3">
+                <li className="text-gray-300">
+                  <span className="text-white font-semibold">{advanceCount}</span> student{advanceCount !== 1 ? 's' : ''} will advance one year.
+                </li>
+                <li className="text-gray-300">
+                  <span className="text-white font-semibold">{graduateCount}</span> final-year (BE) student{graduateCount !== 1 ? 's' : ''} will graduate to <span className="text-indigo-300 font-semibold">Alumni</span>.
+                </li>
+              </ul>
+              <p className="text-xs text-amber-300/80 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+                This is a deliberate, one-way action and isn't easily undone. Only study-year and roll-number prefix change — emails, passwords, and everything else stay the same.
+              </p>
+            </>
+          }
+          confirmLabel="Advance Everyone"
+          onCancel={() => setRolloverOpen(false)}
+          onConfirm={confirmRollover}
+          busy={rollingOver}
+        />
+      )}
+
+      {/* Student profile popup (view-only — no connect button) */}
+      {profileId && (
+        <ProfileModal type="student" id={profileId} viewOnly onClose={() => setProfileId(null)} />
       )}
     </div>
   );

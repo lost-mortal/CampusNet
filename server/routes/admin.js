@@ -14,6 +14,7 @@ const { generateCommunityInsights } = require('../services/gemini');
 const requireAuth = require('../middleware/auth');
 const XLSX = require('xlsx');
 const bcrypt = require('bcryptjs');
+const { uniqueEmail, parseJoinYear } = require('../utils/studentIdentity');
 
 function requireAdmin(req, res, next) {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
@@ -24,10 +25,22 @@ function requireAdmin(req, res, next) {
 
 router.get('/users', requireAuth, requireAdmin, async (req, res, next) => {
   try {
-    const students = await User.find({ role: 'student' })
-      .select('firstName lastName email rollNumber department year joinYear createdAt isRestricted restrictionReason')
+    const students = await User.find({ role: 'student', year: { $ne: 'Alumni' } })
+      .select('firstName lastName email rollNumber department year joinYear phone createdAt isRestricted restrictionReason')
       .sort({ year: 1, department: 1, rollNumber: 1 });
     res.json(students);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Alumni — graduated students (year === 'Alumni'), kept out of the active directory.
+router.get('/alumni', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const alumni = await User.find({ role: 'student', year: 'Alumni' })
+      .select('firstName lastName email rollNumber department year joinYear phone createdAt isRestricted restrictionReason')
+      .sort({ joinYear: 1, department: 1, rollNumber: 1 });
+    res.json(alumni);
   } catch (err) {
     next(err);
   }
@@ -44,7 +57,21 @@ const HEADER_MAP = {
   year: 'year',
   mothername: 'motherName', mothersname: 'motherName',
   birthdate: 'birthDate', dateofbirth: 'birthDate', dob: 'birthDate',
+  phone: 'phone', phonenumber: 'phone', mobile: 'phone', mobileno: 'phone', contact: 'phone',
+  email: 'email', emailid: 'email', mail: 'email',
 };
+
+// 10-digit Indian mobile, tolerant of +91 / leading 0 / spaces / dashes.
+function normPhone(raw) {
+  let d = String(raw || '').replace(/[^0-9]/g, '');
+  if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
+  if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
+  return d;
+}
+function formatPhone(d) {
+  return `+91 ${d.slice(0, 5)} ${d.slice(5)}`;
+}
+const SINHGAD_EMAIL = /^[a-z0-9._%+-]+@sinhgad\.edu$/i;
 
 function normalizeHeader(key) {
   return key.toLowerCase().replace(/[^a-z]/g, '');
@@ -75,9 +102,13 @@ router.post('/import-students', requireAuth, requireAdmin, async (req, res, next
     const VALID_DEPTS = new Set(['COMP', 'ENTC', 'IT', 'MECH']);
     const VALID_YEARS = new Set(['FE', 'SE', 'TE', 'BE']);
 
+    // mode 'provided' = college supplies the email column; 'generated' = we build it.
+    const mode = req.body.mode === 'provided' ? 'provided' : 'generated';
+
     const errors = [];
     const validRows = [];
     const fileRollNumbers = new Set();
+    const fileEmails = new Set();
 
     for (let i = 0; i < rows.length; i++) {
       const row = { ...rows[i] };
@@ -119,18 +150,43 @@ router.post('/import-students', requireAuth, requireAdmin, async (req, res, next
         errors.push(`${label}: Birth Date must be 6 digits DDMMYY (got "${row.birthDate}")`); bad = true;
       }
 
+      // phone: required in BOTH modes
+      const phoneDigits = normPhone(row.phone);
+      if (!row.phone)      { errors.push(`${label}: Missing Phone`); bad = true; }
+      else if (!(phoneDigits.length === 10 && /^[6-9]/.test(phoneDigits))) {
+        errors.push(`${label}: Invalid Phone "${row.phone}" — must be a 10-digit Indian mobile`); bad = true;
+      }
+
+      // email: required + validated only in 'provided' mode
+      let emailLower = '';
+      if (mode === 'provided') {
+        const em = (row.email || '').trim();
+        if (!em)                       { errors.push(`${label}: Missing Email`); bad = true; }
+        else if (!SINHGAD_EMAIL.test(em)) {
+          errors.push(`${label}: Invalid Email "${row.email}" — must be a @sinhgad.edu address`); bad = true;
+        } else emailLower = em.toLowerCase();
+      }
+
       if (bad) continue;
 
       const rnLower = rn.toLowerCase();
       if (fileRollNumbers.has(rnLower)) {
         errors.push(`${label}: Duplicate roll number within the file`);
-      } else {
-        fileRollNumbers.add(rnLower);
-        validRows.push({ ...row, department: dept, year: yr, birthDate: bd, rollNumber: rnLower, rowNum });
+        continue;
       }
+      if (mode === 'provided' && fileEmails.has(emailLower)) {
+        errors.push(`${label}: Duplicate email within the file`);
+        continue;
+      }
+      fileRollNumbers.add(rnLower);
+      if (emailLower) fileEmails.add(emailLower);
+      validRows.push({
+        ...row, department: dept, year: yr, birthDate: bd,
+        rollNumber: rnLower, phone: formatPhone(phoneDigits), email: emailLower, rowNum,
+      });
     }
 
-    // DB duplicate check only on rows that passed local validation
+    // DB duplicate roll-number check (rows that passed local validation)
     if (validRows.length > 0) {
       const existing = await User.find({
         rollNumber: { $in: validRows.map(r => r.rollNumber) },
@@ -142,18 +198,38 @@ router.post('/import-students', requireAuth, requireAdmin, async (req, res, next
       });
     }
 
+    // DB duplicate email check (provided mode) — case-insensitive (emails stored lowercase)
+    if (mode === 'provided' && validRows.length > 0) {
+      const lowers = validRows.map(r => r.email).filter(Boolean);
+      const existingE = await User.find({ email: { $in: lowers } }).select('email');
+      const eSet = new Set(existingE.map(u => (u.email || '').toLowerCase()));
+      validRows.forEach(r => {
+        if (r.email && eSet.has(r.email))
+          errors.push(`Row ${r.rowNum} (${r.rollNumber}): Email ${r.email} already exists`);
+      });
+    }
+
     if (errors.length > 0) return res.status(422).json({ errors });
 
+    // Resolve emails. Generated mode draws unique random codes against all existing
+    // emails + the rest of this batch.
+    let emails;
+    if (mode === 'provided') {
+      emails = validRows.map(r => r.email);
+    } else {
+      const allEmails = await User.find({}).select('email').lean();
+      const taken = new Set(allEmails.map(u => (u.email || '').toLowerCase()));
+      emails = validRows.map(r => uniqueEmail(r.firstName, parseJoinYear(r.rollNumber), taken));
+    }
+
     // All clear — create accounts
-    const toCreate = await Promise.all(validRows.map(async (row) => {
-      const jyMatch = row.rollNumber.match(/(\d{4})/);
-      const joinYear = jyMatch ? parseInt(jyMatch[1]) : new Date().getFullYear();
-      const email = `${row.firstName.toLowerCase()}.${row.rollNumber}@sinhgad.edu`;
+    const toCreate = await Promise.all(validRows.map(async (row, idx) => {
+      const joinYear = parseJoinYear(row.rollNumber);
       const password = `${row.motherName.toLowerCase()}@${row.birthDate}`;
       const passwordHash = await bcrypt.hash(password, 10);
       return {
         rollNumber: row.rollNumber,
-        email,
+        email: emails[idx],
         passwordHash,
         firstName: row.firstName,
         lastName: row.lastName,
@@ -161,6 +237,7 @@ router.post('/import-students', requireAuth, requireAdmin, async (req, res, next
         department: row.department,
         year: row.year,
         joinYear,
+        phone: row.phone,
         motherName: row.motherName,
         birthDate: row.birthDate,
         mustChangePassword: true,
@@ -169,7 +246,41 @@ router.post('/import-students', requireAuth, requireAdmin, async (req, res, next
     }));
 
     await User.insertMany(toCreate);
-    res.json({ imported: toCreate.length });
+    res.json({ imported: toCreate.length, mode });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ─── ACADEMIC YEAR ROLLOVER ──────────────────────────────────────────────────
+// Promote every student one study-year: FE→SE→TE→BE→Alumni. Only `year` and the
+// roll-number prefix (fe→se→te→be→al) change; joinYear / department / numeric roll
+// / email / password are untouched. Alumni are the final state and are skipped.
+router.post('/advance-year', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const NEXT_YEAR = { FE: 'SE', SE: 'TE', TE: 'BE', BE: 'Alumni' };
+    const NEXT_PREFIX = { FE: 'se', SE: 'te', TE: 'be', BE: 'al' };
+
+    const students = await User.find({
+      role: 'student',
+      year: { $in: ['FE', 'SE', 'TE', 'BE'] },
+    }).select('rollNumber year');
+
+    const ops = [];
+    let promoted = 0, graduated = 0;
+    for (const s of students) {
+      const next = NEXT_YEAR[s.year];
+      if (!next) continue;
+      const set = { year: next };
+      if (s.rollNumber && s.rollNumber.length >= 2) {
+        set.rollNumber = NEXT_PREFIX[s.year] + s.rollNumber.slice(2);
+      }
+      ops.push({ updateOne: { filter: { _id: s._id }, update: { $set: set } } });
+      if (next === 'Alumni') graduated++; else promoted++;
+    }
+
+    if (ops.length) await User.bulkWrite(ops);
+    res.json({ ok: true, promoted, graduated, total: ops.length });
   } catch (err) {
     next(err);
   }

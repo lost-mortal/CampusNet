@@ -11,7 +11,7 @@ const API = import.meta.env.VITE_API_URL;
 
 // entityId prop: when rendered inside ProfileModal, id is passed directly.
 // Falls back to useParams when rendered as a route component.
-const StudentPublicProfile = ({ entityId, asModal = false, onClose }) => {
+const StudentPublicProfile = ({ entityId, asModal = false, onClose, hideActions = false }) => {
   const params = useParams();
   const studentId = entityId || params.studentId;
   const navigate = useNavigate();
@@ -30,17 +30,19 @@ const StudentPublicProfile = ({ entityId, asModal = false, onClose }) => {
     setLoading(true);
     setError('');
     setData(null);
-    Promise.all([
-      axios.get(`${API}/api/students/${studentId}`, { headers }),
-      axios.get(`${API}/api/connections/status/${studentId}`, { headers }),
-    ])
+    // Admin / view-only callers don't have (or want) a connection status — skip it.
+    const reqs = [axios.get(`${API}/api/students/${studentId}`, { headers })];
+    if (!hideActions) reqs.push(axios.get(`${API}/api/connections/status/${studentId}`, { headers }));
+    Promise.all(reqs)
       .then(([s, c]) => {
         if (cancelled) return;
         setData(s.data);
-        setConnStatus(c.data.status);
-        if (c.data.status === 'self') {
-          if (asModal) onClose?.();
-          else navigate('/profile', { replace: true });
+        if (!hideActions && c) {
+          setConnStatus(c.data.status);
+          if (c.data.status === 'self') {
+            if (asModal) onClose?.();
+            else navigate('/profile', { replace: true });
+          }
         }
       })
       .catch(err => { if (!cancelled) setError(err.response?.data?.error || 'Failed to load profile'); })
@@ -84,6 +86,7 @@ const StudentPublicProfile = ({ entityId, asModal = false, onClose }) => {
   }
 
   const renderActionButton = () => {
+    if (hideActions) return null;
     if (connStatus === 'connected') {
       return (
         <div className="flex flex-col gap-2 items-end">

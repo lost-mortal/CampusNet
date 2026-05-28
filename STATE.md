@@ -8,9 +8,9 @@ Do not delete history. Append. The full build history lives here so any new chat
 
 ## Current position
 
-**Day:** 3 (build complete)
-**Last phase passed:** 3.5 — entire app is built (phases 1.1 through 3.5 all done); deployment hardening complete (commit 11e3999 pushed to main); Vercel + Render auto-deployed; deployed `/api/health` returns ok+dbConnected; CORS preflight from Vercel origin returns 204
-**Next step:** Manual smoke test of both deployed Vercel URL and localhost — confirm parity (deployment changes didn't break local flow)
+**Day:** post-launch
+**Last phase passed:** 3.5 — entire app is built + deployed (commit 11e3999). Post-launch feature pass (2026-05-28): student lifecycle — phone field, joining-year email scheme + safe in-place migration, dual-mode CSV import, academic-year rollover, alumni section, directory filters, admin view-only profile popups. Code complete; client build + server module load verified.
+**Next step:** (1) USER runs `node scripts/migrateEmailsPhones.js` (dry-run) then `--commit` against the DB to switch the existing 30 students to new emails + phones. (2) Manual browser smoke test of the new admin UI (import modes, rollover, alumni, profile popup).
 **Blocked on:** nothing
 
 ---
@@ -107,6 +107,16 @@ Mark each phase: ⏳ pending · 🔨 in progress · ✅ passed gate · ❌ block
 - 2026-05-17: BUG 1 React Router transition crash — ChannelChat's `navigate('/club/chat/general')` in useEffect fired twice under React 19 StrictMode (mount → cleanup → remount), throwing "Cannot transition to a new state, already under transition" which surfaced at /club/recruitment/:id via the ClubLayout-level ErrorBoundary. Fixed by wrapping the navigate in setTimeout(fn, 0) with a clearTimeout cleanup so StrictMode's simulated unmount cancels the pending nav.
 - 2026-05-17: BUG 2 Already registered button — feed event card now grey-disables "Already Registered" pill instead of "Register Now" when GET /api/posts.alreadyRegistered is true.
 - 2026-05-22: BUG 3 — UTF-8 → CP1252 → UTF-8 double-encoding mojibake in 30 client source files (`Â·` / `â€¦` / `ðŸ"¢` etc.) caused by PowerShell 5.1's CP1252-default `Set-Content`. User spotted it on the deployed Vercel link (member list `·`, announcements `📢`, dropdown arrows). Reverse round-trip script (`scripts/fix-mojibake.js`) restored all chars cleanly; production build verified.
+
+- 2026-05-28: Student email scheme changed `firstname.rollnumber` → `firstname.<5-letter-code><joiningYY>@sinhgad.edu`. Code is RANDOMLY generated (not surname-derived — the `arjun.sharm25` example in the spec was format-only; user corrected this 3x). Keyed off joining year so it survives study-year rollover. One shared generator `server/utils/studentIdentity.js` (`uniqueEmail` random for import; `deterministicEmail` seeded from roll number for migration+seeds so dry-run==commit and seeds match DB; `fakePhone` deterministic Indian mobile).
+- 2026-05-28: Added `User.phone` (default '') and extended `User.year` enum with `'Alumni'`. Existing docs read phone as '' until migrated; no doc has 'Alumni' until rollover runs.
+- 2026-05-28: Migration `server/scripts/migrateEmailsPhones.js` — dry-run by default, `--commit` to write, `$set` ONLY email+phone on role:student, deterministic (idempotent). USER runs it; Claude never runs it. No reseed.
+- 2026-05-28: `POST /api/admin/advance-year` rollover — FE→SE→TE→BE→Alumni, roll prefix fe→se→te→be→al via bulkWrite; only year+rollNumber change (email/password/joinYear/dept/num untouched). Alumni skipped (final state). Confirmation modal in ManageUsers shows advance/graduate counts (computed client-side from loaded list).
+- 2026-05-28: `GET /api/admin/users` now excludes `year:'Alumni'` and selects phone; new `GET /api/admin/alumni` returns graduated students. New `/admin/alumni` route + `AlumniDirectory.jsx` page + sidebar item.
+- 2026-05-28: `POST /api/admin/import-students` now takes `mode: 'provided'|'generated'`. Both modes require a `phone` column (validated 10-digit Indian). Provided mode also requires `email` (@sinhgad.edu, unique case-insensitively vs DB + within file, stored as given). Generated mode builds unique random emails. Two mode-selector cards added under the drop zone in ManageUsers.
+- 2026-05-28: Admin student profile popup is VIEW-ONLY — `StudentPublicProfile` gained `hideActions` (skips the connections/status fetch + hides Connect/Message); `ProfileModal` gained `viewOnly`. Admin contacts students via the directory phone column instead of connecting. Clicking a student name in Student Directory or Alumni opens this popup.
+- 2026-05-28: Student Directory gained Department + Year filter dropdowns and a Phone column (row: name·roll·email·dept·year·phone·actions).
+- 2026-05-28: ManageClubs president picker now excludes alumni (`year === 'Alumni'`) from the dropdown in both create and edit flows — alumni are never assignable as president. A current president who has rolled over to alumni is filtered out of the dropdown but still shown in the picker via new `fallbackSelected`/`currentPresident` (resolved from the full roster, since the picker otherwise derives the placeholder name from the same filtered list). Filter-only change; no other club access/logic touched.
 
 (Append new decisions here as you build. One line each.)
 

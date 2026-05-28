@@ -4,12 +4,17 @@ import axios from 'axios';
 import { getToken } from '../../lib/session';
 
 // Searchable student picker — replaces native <select> for scalability
-const StudentPicker = ({ students, value, onChange }) => {
+const StudentPicker = ({ students, value, onChange, fallbackSelected = null }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
-  const selected = students.find(s => s._id === value) || null;
+  // Resolve the selected student from the (filtered) options, falling back to an
+  // explicitly-provided student when the selection isn't in the dropdown list —
+  // e.g. a current president who has become alumni and is no longer assignable.
+  const selected =
+    students.find(s => s._id === value) ||
+    (fallbackSelected && fallbackSelected._id === value ? fallbackSelected : null);
 
   // Close on outside click
   useEffect(() => {
@@ -137,13 +142,22 @@ const ManageClubs = () => {
   // Create flow: only students not in any club (existing behavior).
   // Edit flow: only this club's own members + its current president — so the
   // admin reassigns the presidency from within the club.
+  // Either way, alumni (year === 'Alumni') are never assignable as president.
+  // A current president who has rolled over to alumni is filtered out of the
+  // dropdown too, but still shown in the picker's placeholder (see currentPresident).
   const eligibleStudents = editingClub
     ? (() => {
         const allowed = new Set((editingClub.memberIds || []).map(String));
         if (allowedPresidentId) allowed.add(allowedPresidentId);
-        return students.filter(s => allowed.has(String(s._id)));
+        return students.filter(s => allowed.has(String(s._id)) && s.year !== 'Alumni');
       })()
-    : students.filter(s => !assignedIds.has(String(s._id)));
+    : students.filter(s => !assignedIds.has(String(s._id)) && s.year !== 'Alumni');
+
+  // The currently-assigned president, resolved from the full roster so the picker
+  // can keep displaying their name even after they've been filtered out as alumni.
+  const currentPresident = editingClub
+    ? students.find(s => String(s._id) === String(formData.presidentId)) || null
+    : null;
 
   const showFeedback = (type, message) => {
     setFeedback({ type, message });
@@ -341,6 +355,7 @@ const ManageClubs = () => {
                     students={eligibleStudents}
                     value={formData.presidentId}
                     onChange={(id) => setFormData({ ...formData, presidentId: id })}
+                    fallbackSelected={currentPresident}
                   />
                   <p className="text-xs text-gray-500 mt-2">
                     {editingClub
