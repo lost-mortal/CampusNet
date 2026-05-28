@@ -269,10 +269,6 @@ const LandingPage = () => {
                                                 {loading ? 'Signing in…' : 'Sign In'}
                                             </button>
                                         </form>
-
-                                        <p className="text-center text-xs text-gray-600 mt-6">
-                                            Default password: <span className="text-gray-400 font-mono">CampusNet@123</span>
-                                        </p>
                                     </>
                                 ) : (
                                     <>

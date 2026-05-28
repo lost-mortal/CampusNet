@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, Sparkles, Loader, Users, Building2, User, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,44 @@ const LOADING_PHRASES = [
     'Sniffing out matches…',
 ];
 const pickPhrase = () => LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)];
+
+// Gemini returns full one-sentence reasons, but the cards clamp them to a single
+// line. Show a "see more" toggle (only when the text actually overflows) so the
+// whole explanation is readable. Uses a span — not a button — so it can sit inside
+// the student card's profile-nav button without nesting interactive elements.
+const ExpandableReason = ({ text }) => {
+    const [expanded, setExpanded] = useState(false);
+    const [overflowing, setOverflowing] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (el) setOverflowing(el.scrollHeight > el.clientHeight + 1);
+    }, [text]);
+
+    if (!text) return null;
+
+    const toggle = (e) => { e.stopPropagation(); setExpanded(v => !v); };
+
+    return (
+        <>
+            <p ref={ref} className={`text-xs text-gray-500 mt-0.5 ${expanded ? '' : 'line-clamp-1'}`}>
+                {text}
+            </p>
+            {(overflowing || expanded) && (
+                <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={toggle}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } }}
+                    className="inline-block mt-0.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 cursor-pointer"
+                >
+                    {expanded ? 'see less' : 'see more'}
+                </span>
+            )}
+        </>
+    );
+};
 
 const Search = () => {
     const [query, setQuery] = useState('');
@@ -205,7 +243,7 @@ const Search = () => {
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate">{club.name}</p>
-                                                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{club.reason}</p>
+                                                        <ExpandableReason text={club.reason} />
                                                     </div>
                                                 </div>
                                                 <button
@@ -241,7 +279,7 @@ const Search = () => {
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate">{comm.name}</p>
-                                                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{comm.reason}</p>
+                                                        <ExpandableReason text={comm.reason} />
                                                     </div>
                                                 </div>
                                                 <button
@@ -281,7 +319,7 @@ const Search = () => {
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-white text-sm truncate hover:text-indigo-300 transition-colors">{student.name}</p>
                                                         <p className="text-xs text-gray-600 font-mono">{student.rollNumber}</p>
-                                                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{student.reason}</p>
+                                                        <ExpandableReason text={student.reason} />
                                                     </div>
                                                 </button>
                                                 {sentTo.has(student.id) ? (
