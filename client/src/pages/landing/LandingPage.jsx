@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import {
-    Zap, Users, Ticket, Bell, BarChart3, Megaphone,
+    Zap, Users, Ticket, Megaphone, Newspaper, Handshake,
+    MessageSquare, Sparkles, ShieldCheck,
     ChevronRight, Globe, Terminal, Eye, EyeOff, Lock, Mail,
-    ShieldAlert, Phone, X as XIcon,
+    ShieldAlert, Phone, X as XIcon, Search, KeyRound,
 } from 'lucide-react';
 import { setSession } from '../../lib/session';
 
@@ -83,12 +84,15 @@ const LandingPage = () => {
     };
 
     const features = [
-        { icon: <Zap className="text-yellow-400" />, title: "Smart Feed & Semantic Search", desc: "No more information overload. Our AI curates events based on your academic profile and interests, while AI-powered search lets you query naturally." },
-        { icon: <Users className="text-blue-400" />, title: "Collaborative Communities", desc: "Connect with peers who share your passions. Brainstorm ideas, form hackathon teams, and build projects in dedicated, moderated hubs." },
-        { icon: <Ticket className="text-green-400" />, title: "One-Tap Registration", desc: "Forget repetitive Google Forms. Register for events and club recruitments instantly with your pre-verified campus profile." },
-        { icon: <Bell className="text-red-400" />, title: "Campus Pulse", desc: "Never miss a deadline again. Critical campus-wide announcements and academic updates pushed directly to your feed." },
-        { icon: <BarChart3 className="text-purple-400" />, title: "Institutional Oversight", desc: "A powerful dashboard for Campus Admins to organize student bodies, track engagement stats, and identify underperforming clubs." },
-        { icon: <Megaphone className="text-pink-400" />, title: "Club Ecosystem", desc: "A complete toolkit for Club Leads: Manage recruitment, track volunteer stats, promote events, and showcase daily activities to the campus." }
+        { icon: <Search className="text-yellow-400" />, title: "Semantic AI Search", desc: "Ask in plain English. AI-powered semantic search understands what you mean and surfaces the right events, clubs, communities, and people — no exact keywords required." },
+        { icon: <Newspaper className="text-blue-400" />, title: "Unified Campus Feed", desc: "One feed for everything happening on campus — recruitment drives, events, collab calls, and general updates — all filterable by tag so you only see what matters to you." },
+        { icon: <Ticket className="text-green-400" />, title: "Events & QR Tickets", desc: "Register for any event in one tap and get a personal QR ticket in your Activity Hub. Organisers scan to mark attendance, and paid events are supported with QR-based payment approval." },
+        { icon: <Megaphone className="text-pink-400" />, title: "Club Recruitment", desc: "Clubs post recruitment drives and applicants apply in seconds. Leads review every application from one dashboard and accept or reject with a single click." },
+        { icon: <Users className="text-indigo-400" />, title: "Communities & Channels", desc: "Join interest-based communities with their own channels, announcement boards, and threaded discussions — moderated hubs to talk, share, and stay in the loop." },
+        { icon: <Handshake className="text-cyan-400" />, title: "Collab & Team-Building", desc: "Post collab requests with the exact skills you need and find teammates for hackathons and projects. Skill tags make the right people easy to discover." },
+        { icon: <MessageSquare className="text-sky-400" />, title: "Real-Time Messaging", desc: "Connect with peers and chat one-on-one with real-time direct messages — coordinate teams, follow up on recruitment, or just stay in touch instantly." },
+        { icon: <Sparkles className="text-purple-400" />, title: "AI Club Insights", desc: "Presidents generate AI-written health reports on their club's activity and engagement, and admins get the same intelligence across every club to spot what's thriving." },
+        { icon: <ShieldCheck className="text-red-400" />, title: "Admin Console & Pulse", desc: "Campus admins manage students, clubs, and communities, push campus-wide announcements, and oversee the full student lifecycle — including an alumni directory." }
     ];
 
     return (
@@ -106,10 +110,22 @@ const LandingPage = () => {
                     </div>
                     <span className="text-2xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">CampusNet</span>
                 </div>
-                <button onClick={openModal} className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all duration-300 font-medium tracking-wide flex items-center gap-2 group">
-                    <span className="group-hover:text-indigo-300 transition-colors">Login</span>
-                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </button>
+                <div className="flex items-center gap-3">
+                    <a
+                        href="/presidents_and_managers.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 md:px-5 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-full transition-all duration-300 text-sm font-medium tracking-wide flex items-center gap-2 text-indigo-300 hover:text-indigo-200 group"
+                    >
+                        <KeyRound size={16} />
+                        <span className="hidden sm:inline">Demo Logins</span>
+                        <span className="sm:hidden">Logins</span>
+                    </a>
+                    <button onClick={openModal} className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all duration-300 font-medium tracking-wide flex items-center gap-2 group">
+                        <span className="group-hover:text-indigo-300 transition-colors">Login</span>
+                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
             </nav>
 
             <main className="relative z-10 flex flex-col items-center justify-center min-h-[70vh] px-4 text-center pt-20">

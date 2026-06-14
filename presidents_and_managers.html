@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusNet — Leadership & Student Directory</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0f14;
+    color: #e2e4ea;
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+
+  header { margin-bottom: 40px; }
+  header p.label {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #5b5f6e; margin-bottom: 10px;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 700;
+    color: #fff; line-height: 1.1;
+  }
+  header h1 span { color: #7c6bff; }
+
+  .admin-card {
+    background: #12141f;
+    border: 1px solid #1e2130;
+    border-left: 3px solid #7c6bff;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .admin-card .tag {
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #7c6bff; margin-bottom: 10px;
+  }
+  .admin-card .cred-row {
+    display: flex; align-items: center; gap: 10px; margin-top: 6px;
+  }
+  .admin-card .cred-label {
+    font-size: 10px; color: #5b5f6e; width: 64px; flex-shrink: 0;
+  }
+  .admin-card .cred-val {
+    font-size: 13px; color: #e2e4ea;
+    background: #1a1d2a; border: 1px solid #262a3a;
+    border-radius: 5px; padding: 3px 10px;
+    letter-spacing: 0.03em;
+  }
+
+  .note-box {
+    background: #111420;
+    border: 1px solid #1e2130;
+    border-left: 3px solid #f5b93e;
+    border-radius: 10px;
+    padding: 16px 22px;
+    margin-bottom: 44px;
+    font-size: 12px;
+    color: #9a9db5;
+    line-height: 2;
+  }
+  .note-box strong { color: #f5b93e; font-weight: 500; display: block; margin-bottom: 2px; }
+  .note-box code {
+    background: #1a1d2a; border: 1px solid #262a3a;
+    border-radius: 4px; padding: 1px 7px;
+    font-size: 11.5px; color: #c8cad4; font-family: 'DM Mono', monospace;
+  }
+
+  .section { margin-bottom: 52px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  }
+  .pill {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.05em; padding: 5px 14px; border-radius: 999px;
+  }
+  .pill-club      { background: rgba(124,107,255,0.15); color: #a99bff; border: 1px solid rgba(124,107,255,0.3); }
+  .pill-community { background: rgba(34,197,134,0.12);  color: #34c588; border: 1px solid rgba(34,197,134,0.25); }
+  .pill-students  { background: rgba(245,158,11,0.12);  color: #f5b93e; border: 1px solid rgba(245,158,11,0.25); }
+  .section-header .count { font-size: 12px; color: #5b5f6e; }
+  .divider { flex: 1; height: 1px; background: #1e2130; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead tr { border-bottom: 1px solid #1e2130; }
+  thead th {
+    text-align: left; padding: 9px 14px;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #5b5f6e; font-weight: 500;
+  }
+  tbody tr { border-bottom: 1px solid #151720; transition: background 0.12s; }
+  tbody tr:hover { background: #13151e; }
+  tbody td { padding: 13px 14px; color: #c8cad4; vertical-align: middle; }
+
+  .name  { color: #e8eaf0; font-weight: 500; }
+  .roll  { font-size: 11.5px; color: #6b6f82; letter-spacing: 0.03em; }
+  .email-val { font-size: 11px; color: #6b7fd4; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .badge-COMP { background: rgba(59,130,246,0.15);  color: #6fa8ff; border: 1px solid rgba(59,130,246,0.2); }
+  .badge-ENTC { background: rgba(245,158,11,0.12);  color: #f5b93e; border: 1px solid rgba(245,158,11,0.2); }
+  .badge-IT   { background: rgba(16,185,129,0.12);  color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+  .badge-MECH { background: rgba(239,68,68,0.12);   color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+
+  .year-badge {
+    display: inline-block; font-size: 11px; padding: 2px 7px;
+    border-radius: 3px; background: #1a1d28; border: 1px solid #262a3a; color: #7a7f96;
+  }
+  .club-name      { color: #a99bff; font-size: 12px; }
+  .community-name { color: #34c588; font-size: 12px; }
+  .birth { color: #44475a; font-size: 11.5px; letter-spacing: 0.04em; }
+
+  footer {
+    margin-top: 40px; font-size: 11px; color: #2e3144;
+    border-top: 1px solid #1a1d28; padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="label">Sinhgad Engineering · CampusNet</p>
+  <h1>Leadership &amp; <span>Student</span> Directory</h1>
+</header>
+
+<div class="admin-card">
+  <div class="tag">Admin Account</div>
+  <div class="cred-row"><span class="cred-label">Email</span><span class="cred-val">admin@sinhgad.edu</span></div>
+  <div class="cred-row"><span class="cred-label">Password</span><span class="cred-val">CampusNet@123</span></div>
+</div>
+
+<div class="note-box">
+  <strong>Student Password Info</strong>
+  Joining (first login) password: <code>MotherName@BirthDate</code> &nbsp;—&nbsp; e.g. <code>sunita@150807</code><br>
+  After first login, password changes to: <code>FirstName@123</code> &nbsp;—&nbsp; e.g. <code>arjun@123</code>
+</div>
+
+<!-- CLUB PRESIDENTS -->
+<div class="section">
+  <div class="section-header">
+    <span class="pill pill-club">Club Presidents</span>
+    <span class="count">6 records</span>
+    <div class="divider"></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Roll Number</th><th>Dept</th><th>Year</th><th>Mother's Name</th><th>Birth Date</th><th>Club</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="name">Karan Verma</span></td>
+        <td><span class="email-val">karan.xkvxz23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023comp001</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Nirmala</td><td><span class="birth">040304</span></td>
+        <td><span class="club-name">🤖 Robotics Club</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Tanvi Sawant</span></td>
+        <td><span class="email-val">tanvi.ihdqw22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022comp001</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Swapna</td><td><span class="birth">290703</span></td>
+        <td><span class="club-name">💻 GDSC</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Divya Gupta</span></td>
+        <td><span class="email-val">divya.rapsa23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023entc002</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Pallavi</td><td><span class="birth">250304</span></td>
+        <td><span class="club-name">🧠 AI/ML Club</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Nikhil Kadam</span></td>
+        <td><span class="email-val">nikhil.egara22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022entc001</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Poonam</td><td><span class="birth">140302</span></td>
+        <td><span class="club-name">🏅 Sports Club</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Shreya Pandey</span></td>
+        <td><span class="email-val">shreya.bhaio22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022it001</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Madhuri</td><td><span class="birth">050203</span></td>
+        <td><span class="club-name">🎵 Music Club</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Yash Patil</span></td>
+        <td><span class="email-val">yash.bvdvg22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022it002</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Kalpana</td><td><span class="birth">170203</span></td>
+        <td><span class="club-name">🔗 WEB3</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- COMMUNITY MANAGERS -->
+<div class="section">
+  <div class="section-header">
+    <span class="pill pill-community">Community Managers</span>
+    <span class="count">5 records</span>
+    <div class="divider"></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Roll Number</th><th>Dept</th><th>Year</th><th>Mother's Name</th><th>Birth Date</th><th>Community</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="name">Rahul Nair</span></td>
+        <td><span class="email-val">rahul.cdbmi24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024comp002</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Priya</td><td><span class="birth">070605</span></td>
+        <td><span class="community-name">🌐 Web Dev Forum</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Aditya Mehta</span></td>
+        <td><span class="email-val">aditya.ipvqv24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024it001</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Shobha</td><td><span class="birth">230605</span></td>
+        <td><span class="community-name">🤖 AI Hub</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Meera Pillai</span></td>
+        <td><span class="email-val">meera.ypmpc23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023mech001</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Radha</td><td><span class="birth">300303</span></td>
+        <td><span class="community-name">🚀 Startup Circle</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Kavya Rao</span></td>
+        <td><span class="email-val">kavya.crzah24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024entc001</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Usha</td><td><span class="birth">190505</span></td>
+        <td><span class="community-name">🎨 Designers Guild</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Rohan Desai</span></td>
+        <td><span class="email-val">rohan.jpqat25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025entc001</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Meena</td><td><span class="birth">030807</span></td>
+        <td><span class="community-name">📸 Photography Club</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- REMAINING STUDENTS -->
+<div class="section">
+  <div class="section-header">
+    <span class="pill pill-students">Remaining Students</span>
+    <span class="count">19 records</span>
+    <div class="divider"></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Email</th><th>Roll Number</th><th>Dept</th><th>Year</th><th>Mother's Name</th><th>Birth Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="name">Amit Sharma</span></td>
+        <td><span class="email-val">amit.srkmo24@sinhgad.edu</span></td>
+        <td><span class="roll">fe2024comp010</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Sunita</td><td><span class="birth">150806</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Arjun Sharma</span></td>
+        <td><span class="email-val">arjun.xnpyz25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025comp001</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Sunita</td><td><span class="birth">150807</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Priya Patel</span></td>
+        <td><span class="email-val">priya.uexsv25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025comp002</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Kavitha</td><td><span class="birth">220806</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Aarav Mishra</span></td>
+        <td><span class="email-val">aarav.takpr25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025comp003</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Geeta</td><td><span class="birth">050807</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Ananya Joshi</span></td>
+        <td><span class="email-val">ananya.wavok25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025it001</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Rekha</td><td><span class="birth">120807</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Nidhi Kulkarni</span></td>
+        <td><span class="email-val">nidhi.xyeie25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025it002</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Lata</td><td><span class="birth">180807</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Vikram Kulkarni</span></td>
+        <td><span class="email-val">vikram.clsjb25@sinhgad.edu</span></td>
+        <td><span class="roll">fe2025mech001</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">FE</span></td>
+        <td>Savita</td><td><span class="birth">280706</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Sneha Iyer</span></td>
+        <td><span class="email-val">sneha.chnlj24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024comp001</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Lakshmi</td><td><span class="birth">150605</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Pooja Nair</span></td>
+        <td><span class="email-val">pooja.cmqwc23@sinhgad.edu</span></td>
+        <td><span class="roll">se2023entc005</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Rekha</td><td><span class="birth">220705</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Aditi Bhosale</span></td>
+        <td><span class="email-val">aditi.tyhuc24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024it002</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Pushpa</td><td><span class="birth">300505</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Pooja Singh</span></td>
+        <td><span class="email-val">pooja.xuxqa24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024mech001</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Anita</td><td><span class="birth">110505</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Raj Chavan</span></td>
+        <td><span class="email-val">raj.nvxze24@sinhgad.edu</span></td>
+        <td><span class="roll">se2024mech002</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">SE</span></td>
+        <td>Sunanda</td><td><span class="birth">110605</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Harsh Wadekar</span></td>
+        <td><span class="email-val">harsh.vvsbt23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023comp002</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Sushma</td><td><span class="birth">200404</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Ishaan Thakur</span></td>
+        <td><span class="email-val">ishaan.cimxo23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023entc001</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Sudha</td><td><span class="birth">160304</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Siddharth Bhat</span></td>
+        <td><span class="email-val">siddharth.gsald23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023it001</span></td>
+        <td><span class="badge badge-IT">IT</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Vandana</td><td><span class="birth">080403</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Prachi More</span></td>
+        <td><span class="email-val">prachi.brjgb23@sinhgad.edu</span></td>
+        <td><span class="roll">te2023mech002</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">TE</span></td>
+        <td>Varsha</td><td><span class="birth">090304</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Omkar Shinde</span></td>
+        <td><span class="email-val">omkar.aakwv22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022comp002</span></td>
+        <td><span class="badge badge-COMP">COMP</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Vandita</td><td><span class="birth">160203</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Rutuja Karale</span></td>
+        <td><span class="email-val">rutuja.ogtbf22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022entc002</span></td>
+        <td><span class="badge badge-ENTC">ENTC</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Shanta</td><td><span class="birth">280102</span></td>
+      </tr>
+      <tr>
+        <td><span class="name">Riya Gaikwad</span></td>
+        <td><span class="email-val">riya.zxwbq22@sinhgad.edu</span></td>
+        <td><span class="roll">be2022mech001</span></td>
+        <td><span class="badge badge-MECH">MECH</span></td>
+        <td><span class="year-badge">BE</span></td>
+        <td>Seema</td><td><span class="birth">220302</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>CampusNet · Sinhgad Engineering · 6 club presidents · 5 community managers · 19 remaining students · 30 total</footer>
+
+</body>
+</html>
