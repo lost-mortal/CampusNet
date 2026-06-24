@@ -884,12 +884,19 @@ router.patch('/profile', requireAuth, requireAdmin, async (req, res, next) => {
 
 // ─── STUDENT ADMIN ACTIONS ───────────────────────────────────────────────────
 
-// Reset password: just flag mustChangePassword. The existing login flow
-// (mustChangePassword → /change-password screen) does the rest on next login.
+// Reset password: restore the default credential (motherName@birthDate) and flag
+// mustChangePassword so the login flow forces a change on next sign-in. Restoring
+// the hash is what lets an admin help a student who FORGOT their password — flagging
+// alone left the old hash in place, so a forgotten password stayed locked out.
 router.post('/students/:id/reset-password', requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const u = await User.findById(req.params.id);
     if (!u || u.role !== 'student') return res.status(404).json({ error: 'Student not found' });
+    if (!u.motherName || !u.birthDate) {
+      return res.status(400).json({ error: 'Cannot reset: student is missing motherName/birthDate' });
+    }
+    const defaultPassword = `${u.motherName.toLowerCase()}@${u.birthDate}`;
+    u.passwordHash = await bcrypt.hash(defaultPassword, 10);
     u.mustChangePassword = true;
     await u.save();
     res.json({ ok: true });
