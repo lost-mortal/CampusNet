@@ -33,15 +33,22 @@ function getModel(modelName = 'gemini-2.5-flash-lite') {
 const EMBED_MODEL = 'gemini-embedding-001';
 const EMBED_DIM = 768; // reduced from 3072 — plenty for ranking, cheaper to store/compute
 
+// Two-stage hybrid retrieval.
+//
 // gemini-embedding-001 produces compressed cosine scores (related and unrelated
-// items all sit ~0.5–0.7), so absolute floors don't separate signal from noise.
-// What IS reliable is the ranking and the gap: a genuine match tops out ~0.65+
-// and stands clear of the pack, while a query with no real match peaks ~0.56.
-// So we select RELATIVELY: require the best score to clear MIN_TOP_SCORE (else
-// it's noise → keyword fallback / no match), then keep everything within
-// SCORE_GAP of the top. Both are tunable; calibrated against live embeddings.
-const MIN_TOP_SCORE = 0.62;
-const SCORE_GAP = 0.07;
+// items all sit ~0.5–0.7), so absolute floors don't separate signal from noise;
+// the ranking and the gap from the top are what's reliable.
+//
+// Stage 1 (recall): require the best score to clear MIN_TOP_SCORE (else it's
+// noise → keyword fallback), then pull a GENEROUS shortlist — everything within
+// SHORTLIST_BAND of the top, capped at SHORTLIST_SIZE. A wide band intentionally
+// lets broad, multi-focus entities (e.g. a club whose description only mentions
+// the topic in passing) reach the reasoner instead of being cut by a tight
+// similarity cluster. Stage 2 (the generative pass) then reads their full text
+// and decides precision. All tunable; calibrated against live embeddings.
+const MIN_TOP_SCORE = 0.60;
+const SHORTLIST_BAND = 0.15;
+const SHORTLIST_SIZE = 15;
 
 function getEmbedModel() {
   return getGenAI().getGenerativeModel({ model: EMBED_MODEL });
@@ -136,9 +143,11 @@ async function generateReasons(query, items) {
   if (items.length === 0) return new Map();
   try {
     const prompt = `A student searched: "${query}".
-The entities below were pre-selected by a similarity search. For each one:
-- Set "relevant" to true only if it would genuinely help the student with their search; set it to false for tenuous, stretched, or off-topic matches.
-- Write "reason": ONE short sentence (max 20 words) stating the concrete connection (skill, tag, focus area). When relevant is false, briefly say why it doesn't fit.
+The entities below (clubs, communities, and students) were pre-selected by a similarity search. Read each one's full description/skills carefully and judge it on its merits.
+
+For each entity:
+- Set "relevant" to true if it would genuinely help the student with their search — INCLUDING broad or multi-focus clubs/communities whose description covers the topic among other activities (e.g. a general tech club that also runs web-dev events is relevant to a web-development search). Set it to false only for tenuous, stretched, or off-topic matches.
+- Write "reason": 1-2 sentences explaining the concrete connection, citing the specific detail from the entity — the exact skill, tag, activity, or phrase in its description that relates to the query. For a wide-ranging club, name the particular thing it does that's relevant rather than describing it generically. When relevant is false, briefly say why it doesn't fit.
 
 ENTITIES:
 ${JSON.stringify(items.map(i => ({ id: i.id, name: i.name, info: i.text })))}`;
@@ -148,11 +157,11 @@ ${JSON.stringify(items.map(i => ({ id: i.id, name: i.name, info: i.text })))}`;
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 3072,
         responseMimeType: 'application/json',
         responseSchema: REASONS_SCHEMA,
       },
-    }), 6000);
+    }), 8000);
 
     // One retry — flash-lite occasionally 503s under load; a quick retry usually
     // recovers the high-quality reasons rather than dropping to synthesized ones.
@@ -336,17 +345,15 @@ async function searchEntities(query) {
     // before reporting nothing.
     if (scored[0].score < MIN_TOP_SCORE) return fallback();
 
-    // Keep the cluster of best matches: everything within SCORE_GAP of the top.
-    const cutoff = scored[0].score - SCORE_GAP;
-    const relevant = scored.filter(e => e.score >= cutoff);
+    // Stage 1 (recall): a generous shortlist — everything within SHORTLIST_BAND
+    // of the top match, capped — handed to the reasoner across all types.
+    const shortlist = scored
+      .filter(e => e.score >= scored[0].score - SHORTLIST_BAND)
+      .slice(0, SHORTLIST_SIZE);
 
-    const shortlist = [
-      ...relevant.filter(e => e.type === 'club').slice(0, 5),
-      ...relevant.filter(e => e.type === 'community').slice(0, 5),
-      ...relevant.filter(e => e.type === 'student').slice(0, 5),
-    ];
-
-    // Best-effort relevance judgement + reasons; synthesize if it fails/times out.
+    // Stage 2 (precision + reasoning): flash-lite reads the full descriptions,
+    // drops the irrelevant, and writes the explanations. Best-effort —
+    // synthesize reasons / keep embedding ranking if it fails or times out.
     const reasonMap = await generateReasons(
       query,
       shortlist.map(e => ({ id: e.id, name: displayName(e), text: e.text }))
@@ -358,7 +365,7 @@ async function searchEntities(query) {
     let kept = shortlist.filter(e => reasonMap.get(e.id)?.relevant !== false);
     if (kept.length === 0) kept = shortlist;
 
-    const out = (type) => kept.filter(e => e.type === type);
+    const out = (type) => kept.filter(e => e.type === type).slice(0, 5);
 
     return {
       clubs: out('club').map(e => ({ id: e.id, name: e.entity.name, reason: reasonFor(e) })),
