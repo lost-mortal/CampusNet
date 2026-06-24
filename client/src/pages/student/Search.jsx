@@ -222,6 +222,13 @@ const Search = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className="space-y-10"
                         >
+                            {/* Adjacency note — shown when matches are related rather than exact */}
+                            {results.message && (
+                                <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm">
+                                    <Sparkles size={15} className="mt-0.5 shrink-0 text-indigo-400" />
+                                    <span>{results.message}</span>
+                                </div>
+                            )}
                             {/* Clubs */}
                             {results.clubs?.length > 0 && (
                                 <section>
